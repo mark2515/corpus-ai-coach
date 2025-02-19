@@ -1,7 +1,11 @@
+import { Chat } from "@/components";
+
 export default function Home() {
   return (
-    <div>
-      test
-    </div>
+    <main>
+      <Chat>
+
+      </Chat>
+    </main>
   );
 }
