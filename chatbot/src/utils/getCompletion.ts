@@ -7,16 +7,19 @@ type Props = {
         temperature?: number;
         max_token?: number;
     };
-}
+};
 
 export const getCompletion = async (params: Props) => {
     const resp = await fetch("/api/chat", {
-        body: JSON.stringify({params})
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(params),
     })
     if(!resp.ok) {
         throw new Error(resp.statusText);
     }
 
-    const data = resp.json;
-    return data;
+    return await resp.json();
 }

@@ -32,6 +32,6 @@ export default async function handler(
     body: JSON.stringify(data),
   });
 
-  const json: any = await resp.json();
-  res.status(200).json({...json.choices[0].message});
+  const json = await resp.json();
+  res.status(200).json({ ...json.choices[0].message });
 }
