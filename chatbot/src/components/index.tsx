@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getCompletion } from "@/utils/getCompletion";
 import { Textarea, Button } from "@mantine/core";
 import { ChatLogsType } from "@/types";
+import clsx from "clsx";
 
 export const Chat = () => {
   const [prompt, setPrompt] = useState("");
@@ -32,12 +33,41 @@ export const Chat = () => {
 
   return (
     <div className="h-screen flex flex-col items-center">
-      <div>
-        {chatList.map((item, idx) => <div key={`${item.role}-${idx}`}>
+      <div
+        className={clsx([
+          "flex-col",
+          "h-[calc(100vh-10rem)]",
+          "overflow-y-auto",
+          "rounded-sm",
+          "px-8",
+        ])}
+      >
+        {chatList.map((item, idx) => (
+          <div key={`${item.role}-${idx}`}
+          className={clsx(
+            {
+              flex: item.role === "user",
+              "flex-col": item.role === "user",
+              "items-end": item.role === "user",
+            },
+            "mt-4",
+          )}>
             <div> {item.role} </div>
-            <div> {item.content} </div>
+            <div
+              className={clsx(
+                "rounded-md",
+                "shadow-md",
+                "px-4",
+                "py-2",
+                "mt-1",
+                "w-full",
+                "max-w-4xl"
+              )}
+            > 
+             {item.content} 
+            </div>
           </div>
-        )}
+        ))}
       </div>
       <div className="flex items-center w-3/5">
         <Textarea
