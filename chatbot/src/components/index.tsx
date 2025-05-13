@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCompletion } from "@/utils/getCompletion";
 import { Textarea, Button } from "@mantine/core";
+import { getChatLogs, updateChatLogs } from "@/utils/chatStorage";
 import { ChatLogsType } from "@/types";
 import clsx from "clsx";
+
+const LOCAL_KEY = 'ai_demo';
 
 export const Chat = () => {
   const [prompt, setPrompt] = useState("");
   const [completion, setCompletion] = useState<string>("");
   const [chatList, setChatList] = useState<ChatLogsType>([]);
+
+  useEffect(()=>{
+    const logs = getChatLogs(LOCAL_KEY);
+    setChatList(logs);
+  }, []);
+
+  const setChatLogs = (logs: ChatLogsType) => {
+    setChatList(logs);
+    updateChatLogs(LOCAL_KEY, logs);
+  }
 
   const getAIResp = async() => {
     const list = [
@@ -17,12 +30,12 @@ export const Chat = () => {
         content: prompt,
       },
     ];
-    setChatList(list);
+    setChatLogs(list);
     const resp = await getCompletion({
       prompt: prompt,
     });
     setCompletion(resp.content);
-    setChatList([
+    setChatLogs([
       ...list,
       {
         role: "assistant",
@@ -37,6 +50,7 @@ export const Chat = () => {
         className={clsx([
           "flex-col",
           "h-[calc(100vh-10rem)]",
+          "w-full",
           "overflow-y-auto",
           "rounded-sm",
           "px-8",

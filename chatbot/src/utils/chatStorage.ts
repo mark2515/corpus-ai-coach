@@ -20,10 +20,8 @@ export const getChatLogs = (id: string) => {
 
 export const updateChatLogs = (id: string, log: ChatLogsType) => {
     const logs = getChatLogsContainer();
-    if(logs[id]) {
-        logs[id] = log;
-        setLocal(CHAT_LOGS_KEY, logs);
-    }
+    logs[id] = log;
+    setLocal(CHAT_LOGS_KEY, logs);
 }
 
 export const clearChatLogs = (id: string) => {
