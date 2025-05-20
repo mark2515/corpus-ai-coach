@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, KeyboardEvent } from "react";
 import { getCompletion } from "@/utils/getCompletion";
-import { Textarea, Button } from "@mantine/core";
-import { getChatLogs, updateChatLogs } from "@/utils/chatStorage";
+import { ActionIcon, Textarea } from "@mantine/core";
+import { clearChatLogs, getChatLogs, updateChatLogs } from "@/utils/chatStorage";
+import { IconSend, IconEraser } from "@tabler/icons-react";
 import { ChatLogsType } from "@/types";
 import clsx from "clsx";
 
@@ -9,6 +10,7 @@ const LOCAL_KEY = 'ai_demo';
 
 export const Chat = () => {
   const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
   const [completion, setCompletion] = useState<string>("");
   const [chatList, setChatList] = useState<ChatLogsType>([]);
 
@@ -17,12 +19,25 @@ export const Chat = () => {
     setChatList(logs);
   }, []);
 
+  const onClear = () => {
+    clearChatLogs(LOCAL_KEY);
+    setChatList([]);
+  }
+
+  const onKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
+    if(evt.keyCode === 13 && !evt.shiftKey) {
+      evt.preventDefault();
+      getAIResp();
+    }
+  }
+
   const setChatLogs = (logs: ChatLogsType) => {
     setChatList(logs);
     updateChatLogs(LOCAL_KEY, logs);
   }
 
   const getAIResp = async() => {
+    setLoading(true);
     const list = [
       ...chatList,
       {
@@ -34,6 +49,7 @@ export const Chat = () => {
     const resp = await getCompletion({
       prompt: prompt,
     });
+    setPrompt("");
     setCompletion(resp.content);
     setChatLogs([
       ...list,
@@ -42,6 +58,7 @@ export const Chat = () => {
         content: resp.content,
       },
     ]);
+    setLoading(false);
   }
 
   return (
@@ -84,18 +101,20 @@ export const Chat = () => {
         ))}
       </div>
       <div className="flex items-center w-3/5">
+        <ActionIcon className="mr-2" disabled={loading} onClick={()=>onClear()}>
+          <IconEraser></IconEraser>
+        </ActionIcon>
         <Textarea
         className="w-full"
         value={prompt} 
+        disabled={loading}
+        onKeyDown={(evt) => onKeyDown(evt)}
         onChange={(evt)=>setPrompt(evt.target.value)}
         placeholder="Enter your prompt">
         </Textarea>
-        <Button
-          style={{ color: 'white', backgroundColor: 'green'}}
-          onClick={() => getAIResp()}
-        >
-          Send
-        </Button>
+        <ActionIcon className="ml-2" loading={loading} onClick={()=>getAIResp()}>
+          <IconSend></IconSend>
+        </ActionIcon>
       </div>
     </div>
   )
