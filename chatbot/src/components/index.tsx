@@ -48,6 +48,7 @@ export const Chat = () => {
     setChatLogs(list);
     const resp = await getCompletion({
       prompt: prompt,
+      history: chatList.slice(-4),
     });
     setPrompt("");
     setCompletion(resp.content);
