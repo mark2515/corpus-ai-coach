@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "eventsource-parser": "^3.0.2"
+  }
+}

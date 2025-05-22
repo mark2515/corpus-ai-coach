@@ -1,4 +1,4 @@
-import { ChatLogsType, ChatLogsStorageType } from "@/types";
+import { MessageList, ChatLogsStorageType } from "@/types";
 import { getLocal, setLocal } from "./storage";
 
 const CHAT_LOGS_KEY = "ai_chatLogs";
@@ -18,7 +18,7 @@ export const getChatLogs = (id: string) => {
     return logs[id] || [];
 }
 
-export const updateChatLogs = (id: string, log: ChatLogsType) => {
+export const updateChatLogs = (id: string, log: MessageList) => {
     const logs = getChatLogsContainer();
     logs[id] = log;
     setLocal(CHAT_LOGS_KEY, logs);
