@@ -36,7 +36,7 @@ export default async function handler(req: NextRequest) {
 }
 
 const requestStream = async (payload: StreamPayload) => {
-  const counter = 0;
+  let counter = 0;
   const resp = await fetch(`${process.env.END_POINT}/v1/chat/completions`, {
     headers: {
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -45,6 +45,9 @@ const requestStream = async (payload: StreamPayload) => {
     method: "POST",
     body: JSON.stringify(payload),
   });
+  if(resp.status !== 200) {
+    return resp.body;
+  }
   return createStream(resp, counter);
 }
 

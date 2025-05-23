@@ -2,7 +2,7 @@ import { useEffect, useState, KeyboardEvent } from "react";
 import chatService from "@/utils/chatService";
 import { ActionIcon, Textarea } from "@mantine/core";
 import { clearChatLogs, getChatLogs, updateChatLogs } from "@/utils/chatStorage";
-import { IconSend, IconEraser } from "@tabler/icons-react";
+import { IconSend, IconSendOff, IconEraser } from "@tabler/icons-react";
 import { MessageList } from "@/types";
 import clsx from "clsx";
 
@@ -68,6 +68,9 @@ export const Chat = () => {
   }
 
   const onSubmit = () => {
+    if(loading) {
+      return chatService.cancel();
+    }
     if(!prompt.trim()) return;
     let list : MessageList = [
       ...chatList,
@@ -136,8 +139,8 @@ export const Chat = () => {
         onChange={(evt)=>setPrompt(evt.target.value)}
         placeholder="Enter your prompt">
         </Textarea>
-        <ActionIcon className="ml-2" loading={loading} onClick={()=>onSubmit()}>
-          <IconSend></IconSend>
+        <ActionIcon className="ml-2" onClick={()=>onSubmit()}>
+          { loading ? <IconSendOff /> : <IconSend /> }
         </ActionIcon>
       </div>
     </div>

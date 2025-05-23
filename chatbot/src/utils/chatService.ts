@@ -15,8 +15,15 @@ type Actions = {
 };
 
 class ChatService {
+    private controller: AbortController;
     private static instance: ChatService;
-    public actions?: Actions
+    public actions?: Actions;
+
+    private constructor() {
+        this.controller = new AbortController();
+    }
+
+
     public static getInstance() : ChatService {
         if(!ChatService.instance) {
             ChatService.instance = new ChatService();
@@ -37,6 +44,7 @@ class ChatService {
                     history,
                     options,
                 }),
+                signal: this.controller.signal,
             });
             const data = response.body;
             if(!data) {
@@ -57,7 +65,11 @@ class ChatService {
 
         } finally {
             this.actions?.onCompleted?.(suggestion);
+            this.controller = new AbortController();
         }
+    }
+    public cancel() {
+        this.controller.abort();
     }
 }
 
