@@ -1,7 +1,7 @@
 import { useEffect, useState, KeyboardEvent } from "react";
 import chatService from "@/utils/chatService";
 import { ActionIcon, Textarea } from "@mantine/core";
-import { clearChatLogs, getChatLogs, updateChatLogs } from "@/utils/chatStorage";
+import { clearMessage, getMessage, updateMessage } from "@/utils/chatStorage";
 import { IconSend, IconSendOff, IconEraser } from "@tabler/icons-react";
 import { MessageList } from "@/types";
 import clsx from "clsx";
@@ -21,12 +21,12 @@ export const Chat = () => {
   }
 
   useEffect(()=>{
-    const logs = getChatLogs(LOCAL_KEY);
+    const logs = getMessage(LOCAL_KEY);
     setChatList(logs);
   }, []);
 
   const onClear = () => {
-    clearChatLogs(LOCAL_KEY);
+    clearMessage(LOCAL_KEY);
     setChatList([]);
   }
 
@@ -64,7 +64,7 @@ export const Chat = () => {
 
   const setMessages = (msg: MessageList) => {
     setChatList(msg);
-    updateChatLogs(LOCAL_KEY, msg);
+    updateMessage(LOCAL_KEY, msg);
   }
 
   const onSubmit = () => {

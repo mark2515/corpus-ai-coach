@@ -7,6 +7,13 @@ export type Message = {
 
 export type MessageList = Message[];
 
+export type Session = {
+    name: string;
+    id: string;
+};
+
+export type SessionList = Session[];
+
 export type ChatLogsStorageType = {
     [key: string]: MessageList
 };
