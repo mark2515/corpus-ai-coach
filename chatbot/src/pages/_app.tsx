@@ -6,8 +6,8 @@ import {
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
 
+import { Notifications } from "@mantine/notifications";
 export default function App({ Component, pageProps }: AppProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
   const toggleColorScheme = (value?: ColorScheme) => {
