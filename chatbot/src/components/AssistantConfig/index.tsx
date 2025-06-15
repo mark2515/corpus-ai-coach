@@ -1,7 +1,8 @@
 import { EditAssistant } from "@/types";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect } from "react";
 import { Button, Input, Textarea, NumberInput } from "@mantine/core";
 import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
+import assistantStore from "@/utils/assistantStore";
 const { Wrapper } = Input;
 
 type Props = {
@@ -12,6 +13,12 @@ type Props = {
 
 export const AssistantConfig = ({ assistant, save, remove }: Props) => {
   const [data, setData] = useState<EditAssistant>(assistant);
+  const [assistantCount, setAssistantCount] = useState(0);
+
+  useEffect(() => {
+    const list = assistantStore.getList();
+    setAssistantCount(list.length);
+  }, []);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,7 +114,7 @@ export const AssistantConfig = ({ assistant, save, remove }: Props) => {
           <Button style={{ color: 'white', backgroundColor: 'green'}} type="submit" leftIcon={<IconDeviceFloppy size="1.2rem" />}>
             Save
           </Button>
-          {data.id ? (
+          {data.id && assistantCount > 1 ? (
             <Button
               style={{ color: 'white', backgroundColor: 'red'}} 
               leftIcon={<IconTrash size="1.2rem" />}
