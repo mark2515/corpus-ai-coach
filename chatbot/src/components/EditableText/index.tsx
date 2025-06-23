@@ -1,5 +1,6 @@
-import { useState, KeyboardEvent, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 import clsx from "clsx";
+
 type IProps = {
   text: string;
   onSave: (name: string) => void;
@@ -16,19 +17,12 @@ export const EditableText = (props: IProps) => {
   const onBlur = () => {
     if (isEditing) {
       setIsEditing(false);
-      setText(props.text);
+      props.onSave(text);
     }
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.keyCode === 13) {
-      setIsEditing(false);
-      props.onSave(text);
-    }
   };
 
   if (isEditing) {
@@ -44,7 +38,6 @@ export const EditableText = (props: IProps) => {
         ])}
         type="text"
         value={text}
-        onKeyDown={onKeyDown}
         onChange={onChange}
         onBlur={onBlur}
         autoFocus
