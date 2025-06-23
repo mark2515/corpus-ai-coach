@@ -75,7 +75,7 @@ const Assistant: NextPage = () => {
           </ActionIcon>
         </Link>
         <Text weight={500} size="lg">
-          Language Learn Chatbot
+          Chatbot Management
         </Text>
         <ActionIcon onClick={() => onAddAssistant()}>
           <IconUserPlus></IconUserPlus>

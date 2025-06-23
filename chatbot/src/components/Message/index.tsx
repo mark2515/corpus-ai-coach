@@ -149,7 +149,7 @@ export const Message = ({ sessionId }: Props) => {
               className="px-1"
               rightIcon={<IconDotsVertical size="1rem"></IconDotsVertical>}
             >
-              AI Chatbot
+              AI Chatbots
             </Button>
           </Popover.Target>
           <Popover.Dropdown className="p-3 min-w-[200px]">
