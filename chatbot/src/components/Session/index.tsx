@@ -9,6 +9,10 @@ import {
   ActionIcon,
   Modal,
   Button,
+  Drawer,
+  useMantineTheme,
+  MediaQuery,
+  Burger,
 } from "@mantine/core";
 import clsx from "clsx";
 
@@ -43,6 +47,8 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { colorScheme } = useMantineColorScheme();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const theme = useMantineTheme();
 
   useEffect(() => {
     const list = chatStorage.getSessionStore();
@@ -88,7 +94,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
             Cancel
           </Button>
           <Button
-            style={{ color: 'white', backgroundColor: 'red'}} 
+            style={{ color: 'white', backgroundColor: 'red'}}
             onClick={() => {
               if (pendingDeleteId) {
                 removeSession(pendingDeleteId);
@@ -102,62 +108,124 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
         </div>
       </Modal>
 
-      <div
-        className={clsx(
-          {
-            "bg-black/10": colorScheme === "dark",
-            "bg-gray-100": colorScheme === "light",
-          },
-          "h-screen",
-          "w-64",
-          "flex",
-          "flex-col",
-          "px-2",
-          className,
-        )}
-      >
-        <div className="flex justify-center py-2 w-full">
-          <ActionIcon onClick={() => createSession()} color="green" size="sm">
-            <IconMessagePlus size="1rem" />
-          </ActionIcon>
-        </div>
-
+      <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
         <div
-          className={clsx([
-            "pb-4",
-            "overflow-y-auto",
-            "scrollbar-none",
+          className={clsx(
+            {
+              "bg-black/10": colorScheme === "dark",
+              "bg-gray-100": colorScheme === "light",
+            },
+            "h-screen",
+            "w-64",
             "flex",
             "flex-col",
-            "gap-y-2",
-          ])}
+            "px-2",
+            className,
+          )}
         >
-          {sessionList.map(({ id, name }) => (
-            <div
-              key={id}
-              className={generateItemClasses(id, sessionId, colorScheme)}
-              onClick={() => onChange(id)}
-            >
-              <EditableText
-                text={name}
-                onSave={(name: string) => updateSession(name)}
-              />
-              {sessionList.length > 1 && (
-                <IconTrash
-                  size=".8rem"
-                  color="gray"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    setPendingDeleteId(id);
-                    setShowConfirm(true);
-                  }}
-                  className="mx-1 invisible group-hover:visible"
+          <div className="flex justify-center py-2 w-full">
+            <ActionIcon onClick={() => createSession()} color="green" size="sm">
+              <IconMessagePlus size="1rem" />
+            </ActionIcon>
+          </div>
+
+          <div
+            className={clsx([
+              "pb-4",
+              "overflow-y-auto",
+              "scrollbar-none",
+              "flex",
+              "flex-col",
+              "gap-y-2",
+            ])}
+          >
+            {sessionList.map(({ id, name }) => (
+              <div
+                key={id}
+                className={generateItemClasses(id, sessionId, colorScheme)}
+                onClick={() => onChange(id)}
+              >
+                <EditableText
+                  text={name}
+                  onSave={(name: string) => updateSession(name)}
                 />
-              )}
-            </div>
-          ))}
+                {sessionList.length > 1 && (
+                  <IconTrash
+                    size=".8rem"
+                    color="gray"
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      setPendingDeleteId(id);
+                      setShowConfirm(true);
+                    }}
+                    className="mx-1 invisible group-hover:visible"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </MediaQuery>
+
+      <MediaQuery largerThan="md" styles={{ display: 'none' }}>
+        <Drawer
+          opened={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title="Sessions"
+          position="left"
+          size="xs"
+        >
+          <div className="flex justify-center py-2 w-full">
+            <ActionIcon onClick={() => createSession()} color="green" size="sm">
+              <IconMessagePlus size="1rem" />
+            </ActionIcon>
+          </div>
+
+          <div
+            className="pb-4 overflow-y-auto flex flex-col gap-y-2"
+          >
+            {sessionList.map(({ id, name }) => (
+              <div
+                key={id}
+                className={generateItemClasses(id, sessionId, colorScheme)}
+                onClick={() => onChange(id)}
+              >
+                <EditableText
+                  text={name}
+                  onSave={(name: string) => updateSession(name)}
+                />
+                {sessionList.length > 1 && (
+                  <IconTrash
+                    size=".8rem"
+                    color="gray"
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      setPendingDeleteId(id);
+                      setShowConfirm(true);
+                    }}
+                    className="mx-1"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </Drawer>
+      </MediaQuery>
+
+      <MediaQuery largerThan="md" styles={{ display: 'none' }}>
+        <Burger
+          onClick={() => setDrawerOpen(true)}
+          opened = {false}
+          style={{
+            position: 'relative',
+            top: 30,
+            left: 20,
+            marginRight: '30px',
+          }}
+        >
+          <IconMessagePlus size="1rem" />
+        </Burger>
+      </MediaQuery>
     </>
   );
 };
