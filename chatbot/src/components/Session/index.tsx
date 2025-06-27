@@ -218,7 +218,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
           opened = {false}
           style={{
             position: 'relative',
-            top: 30,
+            top: 20,
             left: 20,
             marginRight: '30px',
           }}

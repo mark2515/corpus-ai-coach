@@ -158,11 +158,7 @@ export const Message = ({ sessionId }: Props) => {
             </Link>
           </Popover.Dropdown>
         </Popover>
-        <div className="flex items-center">
-          <AssistantSelect
-            value={assistant?.id!}
-            onChange={onAssistantChange}
-          ></AssistantSelect>
+        <div className="flex items-center mr-auto">
           <ActionIcon
             size="sm"
             onClick={() => setMode(mode === "text" ? "voice" : "text")}
@@ -173,8 +169,24 @@ export const Message = ({ sessionId }: Props) => {
               <IconHeadphonesOff color="gray" size="1rem"></IconHeadphonesOff>
             )}
           </ActionIcon>
+          <AssistantSelect
+            value={assistant?.id!}
+            onChange={onAssistantChange}
+          ></AssistantSelect>
+          <ThemeSwitch></ThemeSwitch>
         </div>
-        <ThemeSwitch></ThemeSwitch>
+        <div className="flex gap-2 items-center">
+          <Button
+              size="sm"
+              variant="subtle"
+              className="px-1"
+          >
+            Log in
+          </Button>
+          <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }}>
+            Get Started Now
+          </Button>
+        </div>
       </div>
       {mode === "text" ? (
         <>
