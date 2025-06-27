@@ -9,12 +9,13 @@ import {
   useMantineColorScheme,
   Button,
   Popover,
+  Modal,
+  MediaQuery,
 } from "@mantine/core";
 import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
 import { ThemeSwitch } from "../ThemeSwitch";
 import { USERMAP } from "@/utils/constant";
-
 import { AssistantSelect } from "../AssistantSelect";
 import {
   IconSend,
@@ -24,9 +25,9 @@ import {
   IconHeadphones,
   IconHeadphonesOff,
 } from "@tabler/icons-react";
-
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
+import { GoogleLogin } from "@react-oauth/google";
 
 type Props = {
   sessionId: string;
@@ -35,6 +36,7 @@ type Props = {
 export const Message = ({ sessionId }: Props) => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openedModal, setOpenedModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [mode, setMode] = useState<"text" | "voice">("text");
@@ -141,6 +143,18 @@ export const Message = ({ sessionId }: Props) => {
           "h-[6rem]",
         ])}
       >
+        <Modal
+          opened={openedModal}
+          onClose={() => setOpenedModal(false)}
+          title="Log In"
+          centered
+        >
+          <p>Please enter your credentials to continue.</p>
+          <GoogleLogin onSuccess={(credentialResoinse) => {
+            console.log(credentialResoinse)
+          }}
+          onError={() => console.log("Login Failed")} />
+        </Modal>
         <Popover width={100} position="bottom" withArrow shadow="sm">
           <Popover.Target>
             <Button
@@ -175,7 +189,7 @@ export const Message = ({ sessionId }: Props) => {
           ></AssistantSelect>
           <ThemeSwitch></ThemeSwitch>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="hidden md:flex gap-2 items-center">
           <Button
               size="sm"
               variant="subtle"
@@ -183,9 +197,31 @@ export const Message = ({ sessionId }: Props) => {
           >
             Log in
           </Button>
-          <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }}>
+          <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }} onClick={() => setOpenedModal(true)}>
             Get Started Now
           </Button>
+        </div>
+        <div className="flex md:hidden items-center">
+          <Popover position="bottom-end" withArrow shadow="md">
+            <Popover.Target>
+              <ActionIcon variant="subtle">
+                <IconDotsVertical />
+              </ActionIcon>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Button
+                fullWidth
+                variant="subtle"
+                className="mb-2"
+                onClick={() => setOpenedModal(true)}
+              >
+                Get Started Now
+              </Button>
+              <Button fullWidth variant="outline">
+                Log in
+              </Button>
+            </Popover.Dropdown>
+          </Popover>
         </div>
       </div>
       {mode === "text" ? (

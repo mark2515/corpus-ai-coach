@@ -219,8 +219,8 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
           style={{
             position: 'relative',
             top: 20,
-            left: 20,
-            marginRight: '30px',
+            left: 5,
+            marginRight: '10px',
           }}
         >
           <IconMessagePlus size="1rem" />
