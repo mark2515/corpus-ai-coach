@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "eventsource-parser": "^3.0.2"
+    "eventsource-parser": "^3.0.2",
+    "jwt-decode": "^4.0.0"
   }
 }

@@ -28,9 +28,17 @@ import {
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
 import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 type Props = {
   sessionId: string;
+};
+
+type GoogleUser = {
+  name: string;
+  email: string;
+  picture: string;
+  sub: string;
 };
 
 export const Message = ({ sessionId }: Props) => {
@@ -40,7 +48,9 @@ export const Message = ({ sessionId }: Props) => {
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [mode, setMode] = useState<"text" | "voice">("text");
+  const [openedPopover, setOpenedPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
+  const [user, setUser] = useState<GoogleUser | null>(null);
   const updateMessage = (msg: MessageList) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
@@ -150,10 +160,18 @@ export const Message = ({ sessionId }: Props) => {
           centered
         >
           <p>Please enter your credentials to continue.</p>
-          <GoogleLogin onSuccess={(credentialResoinse) => {
-            console.log(credentialResoinse)
+          <GoogleLogin 
+            onSuccess={(credentialResponse) => {
+            if (credentialResponse.credential) {
+              const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
+              console.log("User info:", decoded);
+              setUser(decoded);
+              setOpenedModal(false);
+            }
           }}
-          onError={() => console.log("Login Failed")} />
+          onError={() => console.log("Login Failed")} 
+          auto_select={true}
+          />
         </Modal>
         <Popover width={100} position="bottom" withArrow shadow="sm">
           <Popover.Target>
@@ -189,41 +207,66 @@ export const Message = ({ sessionId }: Props) => {
           ></AssistantSelect>
           <ThemeSwitch></ThemeSwitch>
         </div>
-        <div className="hidden md:flex gap-2 items-center">
-          <Button
-              size="sm"
-              variant="subtle"
-              className="px-1"
-          >
-            Log in
-          </Button>
-          <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }} onClick={() => setOpenedModal(true)}>
-            Get Started Now
-          </Button>
-        </div>
-        <div className="flex md:hidden items-center">
-          <Popover position="bottom-end" withArrow shadow="md">
-            <Popover.Target>
-              <ActionIcon variant="subtle">
-                <IconDotsVertical />
-              </ActionIcon>
-            </Popover.Target>
-            <Popover.Dropdown>
+        {user ? (
+          <img
+            src={user.picture}
+            alt={user.name}
+            className="w-8 h-8 rounded-full border"
+            title={user.name}
+          />
+        ) : (
+          <>
+            <div className="hidden md:flex gap-2 items-center">
               <Button
-                fullWidth
-                variant="subtle"
-                className="mb-2"
-                onClick={() => setOpenedModal(true)}
+                  size="sm"
+                  variant="subtle"
+                  className="px-1"
               >
-                Get Started Now
-              </Button>
-              <Button fullWidth variant="outline">
                 Log in
               </Button>
-            </Popover.Dropdown>
-          </Popover>
-        </div>
-      </div>
+              <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }} onClick={() => setOpenedModal(true)}>
+                Get Started Now
+              </Button>
+            </div>
+            <div className="flex md:hidden items-center">
+              <Popover 
+                opened={openedPopover}
+                onClose={() => setOpenedPopover(false)}
+                position="bottom-end" 
+                withArrow 
+                shadow="md"
+              >
+                <Popover.Target>
+                  <ActionIcon variant="subtle" onClick={() => setOpenedPopover((v) => !v)}>
+                    <IconDotsVertical />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Button
+                    fullWidth
+                    variant="subtle"
+                    className="mb-2"
+                    onClick={() => {
+                      setOpenedModal(true) 
+                      setOpenedPopover(false)
+                    }}
+                  >
+                    Get Started Now
+                  </Button>
+                  <Button 
+                    fullWidth 
+                    variant="outline"
+                    onClick={() => {
+                        setOpenedPopover(false)
+                    }}
+                  >
+                    Log in
+                  </Button>
+                </Popover.Dropdown>
+              </Popover>
+            </div>
+          </>)}
+          </div>
       {mode === "text" ? (
         <>
           <div
@@ -283,7 +326,7 @@ export const Message = ({ sessionId }: Props) => {
                 </div>
               );
             })}
-          </div>
+         </div>
           <div
             className={clsx(
               "flex",
