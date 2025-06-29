@@ -63,6 +63,16 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("googleUser");
+    if (storedUser) {
+      try {
+        const parsedUser: GoogleUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (e) {
+        console.error("Failed to parse stored user", e);
+      }
+    }
+
     const session = chatStorage.getSession(sessionId);
     setAssistant(session?.assistant);
     const msg = chatStorage.getMessage(sessionId);
@@ -164,9 +174,9 @@ export const Message = ({ sessionId }: Props) => {
             onSuccess={(credentialResponse) => {
             if (credentialResponse.credential) {
               const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
-              console.log("User info:", decoded);
               setUser(decoded);
               setOpenedModal(false);
+              localStorage.setItem("googleUser", JSON.stringify(decoded));
             }
           }}
           onError={() => console.log("Login Failed")} 
