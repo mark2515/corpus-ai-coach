@@ -48,7 +48,8 @@ export const Message = ({ sessionId }: Props) => {
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [mode, setMode] = useState<"text" | "voice">("text");
-  const [openedPopover, setOpenedPopover] = useState(false);
+  const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
+  const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [user, setUser] = useState<GoogleUser | null>(null);
   const updateMessage = (msg: MessageList) => {
@@ -92,6 +93,7 @@ export const Message = ({ sessionId }: Props) => {
   const onClear = () => {
     updateMessage([]);
   };
+
   const onKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
     if (evt.keyCode === 13 && !evt.shiftKey) {
       evt.preventDefault();
@@ -149,6 +151,12 @@ export const Message = ({ sessionId }: Props) => {
       history: list.slice(-assistant?.max_log!),
     });
     setPrompt("");
+  };
+
+  const onLogout = () => {
+    localStorage.removeItem("googleUser");
+    setUser(null);
+    setOpenedLogoutPopover(false);
   };
 
   return (
@@ -218,12 +226,37 @@ export const Message = ({ sessionId }: Props) => {
           <ThemeSwitch></ThemeSwitch>
         </div>
         {user ? (
-          <img
-            src={user.picture}
-            alt={user.name}
-            className="w-8 h-8 rounded-full border"
-            title={user.name}
-          />
+          <Popover
+            opened={openedLogoutPopover}
+            onClose={() => setOpenedLogoutPopover(false)}
+            position="bottom-end"
+            withArrow
+            shadow="md"
+          >
+            <Popover.Target>
+              <img
+                src={user.picture}
+                alt={user.name}
+                className="w-8 h-8 rounded-full border cursor-pointer"
+                title={user.name}
+                onClick={() => setOpenedLogoutPopover((v) => !v)}
+              />
+            </Popover.Target>
+            <Popover.Dropdown>
+              <div className="flex flex-col items-start">
+                <div className="mb-2 text-sm text-gray-700">{user.name}</div>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  color="red"
+                  onClick={onLogout}
+                  fullWidth
+                >
+                  Log out
+                </Button>
+              </div>
+            </Popover.Dropdown>
+          </Popover>
         ) : (
           <>
             <div className="hidden md:flex gap-2 items-center">
@@ -240,14 +273,14 @@ export const Message = ({ sessionId }: Props) => {
             </div>
             <div className="flex md:hidden items-center">
               <Popover 
-                opened={openedPopover}
-                onClose={() => setOpenedPopover(false)}
+                opened={openedLoginPopover}
+                onClose={() => setOpenedLoginPopover(false)}
                 position="bottom-end" 
                 withArrow 
                 shadow="md"
               >
                 <Popover.Target>
-                  <ActionIcon variant="subtle" onClick={() => setOpenedPopover((v) => !v)}>
+                  <ActionIcon variant="subtle" onClick={() => setOpenedLoginPopover((v) => !v)}>
                     <IconDotsVertical />
                   </ActionIcon>
                 </Popover.Target>
@@ -258,7 +291,7 @@ export const Message = ({ sessionId }: Props) => {
                     className="mb-2"
                     onClick={() => {
                       setOpenedModal(true) 
-                      setOpenedPopover(false)
+                      setOpenedLoginPopover(false)
                     }}
                   >
                     Get Started Now
@@ -267,7 +300,7 @@ export const Message = ({ sessionId }: Props) => {
                     fullWidth 
                     variant="outline"
                     onClick={() => {
-                        setOpenedPopover(false)
+                        setOpenedLoginPopover(false)
                     }}
                   >
                     Log in
