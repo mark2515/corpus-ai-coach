@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
     "eventsource-parser": "^3.0.2",
     "express": "^5.1.0",
     "jwt-decode": "^4.0.0"

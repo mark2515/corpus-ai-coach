@@ -28,6 +28,7 @@ import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 type Props = {
   sessionId: string;
@@ -41,6 +42,17 @@ type GoogleUser = {
 };
 
 export const Message = ({ sessionId }: Props) => {
+  //for test
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const res = await axios.get('http://localhost:5000/api/users');
+      console.log(res);
+    }
+    fetchProducts();
+  }, [])
+  //for test
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [openedModal, setOpenedModal] = useState(false);
