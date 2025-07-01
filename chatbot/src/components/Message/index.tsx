@@ -10,7 +10,6 @@ import {
   Button,
   Popover,
   Modal,
-  MediaQuery,
 } from "@mantine/core";
 import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
@@ -203,7 +202,7 @@ export const Message = ({ sessionId }: Props) => {
             </Button>
           </Popover.Target>
           <Popover.Dropdown className="p-3 min-w-[200px]">
-            <Link href="/assistant" className="no-underline text-green-600">
+            <Link href="/chatbots" className="no-underline text-green-600">
               Chatbot Management
             </Link>
           </Popover.Dropdown>

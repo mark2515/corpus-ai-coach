@@ -1,6 +1,19 @@
 {
   "dependencies": {
     "eventsource-parser": "^3.0.2",
+    "express": "^5.1.0",
     "jwt-decode": "^4.0.0"
+  },
+  "name": "language-learn-chatbot",
+  "version": "1.0.0",
+  "description": "typescript project",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mark",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.8"
   }
 }
