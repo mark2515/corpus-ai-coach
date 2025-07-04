@@ -15,6 +15,10 @@
   "author": "Mark",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^24.0.8"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
