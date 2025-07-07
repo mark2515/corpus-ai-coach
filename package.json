@@ -15,7 +15,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "ts-node backend/server.ts",
     "client": "npm run dev --prefix chatbot",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "ts-node backend/seeder",
+    "data:destroy": "ts-node backend/seeder -d"
   },
   "author": "Mark",
   "license": "ISC",
