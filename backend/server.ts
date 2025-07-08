@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from 'dotenv'
 import users from "./data/users";
 import connectDB from "./config/db";
+import wordListsRouter from "./routers/wordListRouter"
 
 const app = express();
 app.use(cors());
@@ -23,3 +24,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT} under ${process.env.NODE_ENV} mode`);
 });
+
+app.use('/api/wordLists', wordListsRouter);
