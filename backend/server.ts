@@ -3,13 +3,18 @@ import cors from "cors";
 import dotenv from 'dotenv'
 import users from "./data/users";
 import connectDB from "./config/db";
-import wordListsRouter from "./routers/wordListRouter"
+import wordListsRouter from "./routers/wordListRouter";
+import { notFound, errorHandler } from './middleware/errorMiddleware'
 
 const app = express();
 app.use(cors());
 dotenv.config();
-
 connectDB();
+
+app.use((req, res, next) => {
+    console.log(req.originalUrl)
+    next()
+})
 
 app.get("/", (req, res) => {
   res.send("Hello World from TypeScript!");
@@ -26,3 +31,6 @@ app.listen(PORT, () => {
 });
 
 app.use('/api/wordLists', wordListsRouter);
+
+app.use(notFound)
+app.use(errorHandler)
