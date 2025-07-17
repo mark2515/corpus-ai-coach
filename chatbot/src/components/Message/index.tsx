@@ -42,7 +42,7 @@ type GoogleUser = {
 };
 
 export const Message = ({ sessionId }: Props) => {
-  //for test
+  //backend connection test
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const Message = ({ sessionId }: Props) => {
     }
     fetchProducts();
   }, [])
-  //for test
+  //backend connection test
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [openedModal, setOpenedModal] = useState(false);

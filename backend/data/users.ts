@@ -1,6 +1,6 @@
 export interface User {
-  name: String;
-  image: String;
+  name: string;
+  image: string;
 }
 
 const users: User[] = [

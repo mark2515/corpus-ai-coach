@@ -1,6 +1,6 @@
 export interface WordLists {
-  rank: String;
-  word: String;
+  rank: string;
+  word: string;
 }
 
 const wordLists: WordLists[] = [
