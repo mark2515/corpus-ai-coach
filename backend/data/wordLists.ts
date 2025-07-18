@@ -12,9 +12,13 @@ const wordLists: WordLists[] = [
     rank: '2',
     word: 'be',
   },
-    {
+  {
     rank: '3',
     word: 'and',
+  },
+  {
+    rank: '4',
+    word: 'of',
   },
 ];
 

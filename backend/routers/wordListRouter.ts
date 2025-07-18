@@ -15,9 +15,10 @@ router.get('/', asyncHandler(async (req, res) => {
 // @desc    add a new word
 // @route   POST /api/wordLists
 // @access  Public
-router.post('/', (req, res) => {
+router.post('/', asyncHandler(async (req, res) => {
   const { rank, word } = req.body;
-  res.status(201).json({ message: 'Word added!', rank, word });
-});
+  const newWord = await WordLists.create({ rank, word });
+  res.status(201).json(newWord);
+}));
 
 export default router

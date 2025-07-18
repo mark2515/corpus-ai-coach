@@ -4,7 +4,7 @@ const wordListsSchema = new mongoose.Schema(
 {
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false, // temporary
         ref: 'User',
     },
     rank: {
