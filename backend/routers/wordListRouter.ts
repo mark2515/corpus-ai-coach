@@ -8,20 +8,16 @@ const router = express.Router()
 //@route    GET/api/wordLists
 //@access   public
 router.get('/', asyncHandler(async (req, res) => {
-    const wordLists = await WordLists.find({})
-    res.json(wordLists)
+    const wordLists = await WordLists.find({});
+    res.json(wordLists);
 }))
 
-//@desc     request a single word
-//@route    GET/api/wordLists/:id
-//@access   public
-router.get('/:id', asyncHandler(async (req, res) => {
-    const wordLists = await WordLists.findById(req.params.id)
-    if(wordLists) {
-        res.json(wordLists)
-    } else {
-        res.status(404).json({ message: 'The wordLists cannot be found!'})
-    }
-}))
+// @desc    add a new word
+// @route   POST /api/wordLists
+// @access  Public
+router.post('/', (req, res) => {
+  const { rank, word } = req.body;
+  res.status(201).json({ message: 'Word added!', rank, word });
+});
 
 export default router
