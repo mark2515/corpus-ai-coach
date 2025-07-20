@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import { Button } from "@mantine/core";
-import { addWordLists, fetchWordLists, saveWordLists } from "@/slices/wordListsSlice";
+import { fetchWordLists, saveWordLists } from "@/slices/wordListsSlice";
 import { useAppDispatch, useAppSelector } from "@/store";
+import { totalWordsSelector } from "@/slices/wordListsSlice";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
   const wordLists = useAppSelector((state) => state.wordList.wordLists);
+  const totalWords = useAppSelector(totalWordsSelector);
 
   useEffect(() => {
     dispatch(fetchWordLists());
@@ -33,6 +35,7 @@ export default function TestPage() {
           </li>
         ))}
       </ul>
+      <div>Totol Words Count: {totalWords}</div>
     </div>
   );
 }

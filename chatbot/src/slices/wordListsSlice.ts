@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "@/store";
 
 export interface WordLists {
   rank: string;
@@ -61,3 +62,9 @@ export const WordListsSlice = createSlice({
 
 export default WordListsSlice.reducer;
 export const { addWordLists } = WordListsSlice.actions;
+
+const words = (state: RootState) => state.wordList.wordLists;
+export const totalWordsSelector = createSelector([words], (words) => {
+  console.log("custom selectore runned");
+  return words.length;
+});
