@@ -196,6 +196,17 @@ export const Message = ({ sessionId }: Props) => {
               setUser(decoded);
               setOpenedModal(false);
               localStorage.setItem("googleUser", JSON.stringify(decoded));
+
+              axios.post("http://localhost:5000/api/users/google-login", {
+                name: decoded.name,
+                email: decoded.email,
+                picture: decoded.picture,
+                sub: decoded.sub,
+              }).then(() => {
+                console.log("User saved");
+              }).catch((err) => {
+                console.error("Failed to save user", err);
+              });
             }
           }}
           onError={() => console.log("Login Failed")} 

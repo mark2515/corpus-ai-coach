@@ -4,8 +4,8 @@ import WordLists from '../models/wordListsModel'
 
 const router = express.Router()
 
-//@desc     request all words
-//@route    GET/api/wordLists
+//@desc     get all words
+//@route    GET /api/wordLists
 //@access   public
 router.get('/', asyncHandler(async (req, res) => {
     const wordLists = await WordLists.find({});
@@ -14,7 +14,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // @desc    add a new word
 // @route   POST /api/wordLists
-// @access  Public
+// @access  public
 router.post('/', asyncHandler(async (req, res) => {
   const { rank, word } = req.body;
   const newWord = await WordLists.create({ rank, word });
