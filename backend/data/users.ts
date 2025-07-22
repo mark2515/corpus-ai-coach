@@ -1,16 +1,22 @@
 export interface User {
-  name: string;
-  image: string;
+  name: String;
+  email: String;
+  picture: String;
+  sub: String;
 }
 
 const users: User[] = [
   {
     name: 'user1',
-    image: '/images/user1.jpg',
+    email: 'user1@gmail.com',
+    picture: '/images/user1.jpg',
+    sub: 'user1_sub',
   },
   {
     name: 'user2',
-    image: '/images/user2.jpg',
+    email: 'user2@gmail.com',
+    picture: '/images/user2.jpg',
+    sub: 'user2_sub',
   },
 ];
 

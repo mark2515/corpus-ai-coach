@@ -29,6 +29,7 @@ import clsx from "clsx";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 type Props = {
   sessionId: string;
@@ -75,7 +76,7 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("googleUser");
+    const storedUser = Cookies.get("googleUser");
     if (storedUser) {
       try {
         const parsedUser: GoogleUser = JSON.parse(storedUser);
@@ -165,7 +166,7 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   const onLogout = () => {
-    localStorage.removeItem("googleUser");
+    Cookies.remove("googleUser");
     setUser(null);
     setOpenedLogoutPopover(false);
   };
@@ -195,7 +196,7 @@ export const Message = ({ sessionId }: Props) => {
               const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
               setUser(decoded);
               setOpenedModal(false);
-              localStorage.setItem("googleUser", JSON.stringify(decoded));
+              Cookies.set("googleUser", JSON.stringify(decoded), { expires: 7 });
 
               axios.post("http://localhost:5000/api/users/google-login", {
                 name: decoded.name,
