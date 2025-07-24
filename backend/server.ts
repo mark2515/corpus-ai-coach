@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv'
-import users from "./data/users";
 import connectDB from "./config/db";
 import userRouters from './routers/userRouters';
 import wordListsRouter from "./routers/wordListRouters";

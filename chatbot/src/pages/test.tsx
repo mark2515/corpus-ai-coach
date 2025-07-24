@@ -22,7 +22,7 @@ export default function TestPage() {
         className="mb-2"
         fullWidth
         onClick={() =>
-          dispatch(saveWordLists({ word: "hello", rank: "100" }))
+          dispatch(saveWordLists({ user: "user2_sub", rank: "100", word: "hello", }))
         }
       >
         Add a word

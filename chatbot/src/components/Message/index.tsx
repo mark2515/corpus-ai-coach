@@ -43,17 +43,6 @@ type GoogleUser = {
 };
 
 export const Message = ({ sessionId }: Props) => {
-  //backend connection test
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const res = await axios.get('http://localhost:5000/api/users');
-      console.log(res);
-    }
-    fetchProducts();
-  }, [])
-  //backend connection test
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [openedModal, setOpenedModal] = useState(false);
@@ -192,26 +181,26 @@ export const Message = ({ sessionId }: Props) => {
           <p>Please enter your credentials to continue.</p>
           <GoogleLogin 
             onSuccess={(credentialResponse) => {
-            if (credentialResponse.credential) {
-              const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
-              setUser(decoded);
-              setOpenedModal(false);
-              Cookies.set("googleUser", JSON.stringify(decoded), { expires: 7 });
+              if (credentialResponse.credential) {
+                const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
+                setUser(decoded);
+                setOpenedModal(false);
+                Cookies.set("googleUser", JSON.stringify(decoded), { expires: 7 });
 
-              axios.post("http://localhost:5000/api/users/google-login", {
-                name: decoded.name,
-                email: decoded.email,
-                picture: decoded.picture,
-                sub: decoded.sub,
-              }).then(() => {
-                console.log("User saved");
-              }).catch((err) => {
-                console.error("Failed to save user", err);
-              });
-            }
-          }}
-          onError={() => console.log("Login Failed")} 
-          auto_select={true}
+                axios.post("http://localhost:5000/api/users/google-login", {
+                  name: decoded.name,
+                  email: decoded.email,
+                  picture: decoded.picture,
+                  sub: decoded.sub,
+                }).then(() => {
+                  console.log("User saved");
+                }).catch((err) => {
+                  console.error("Failed to save user", err);
+                });
+              }
+            }}
+            onError={() => console.log("Login Failed")} 
+            auto_select={true}
           />
         </Modal>
         <Popover width={100} position="bottom" withArrow shadow="sm">

@@ -16,8 +16,8 @@ router.get('/', asyncHandler(async (req, res) => {
 // @route   POST /api/wordLists
 // @access  public
 router.post('/', asyncHandler(async (req, res) => {
-  const { rank, word } = req.body;
-  const newWord = await WordLists.create({ rank, word });
+  const { user, rank, word } = req.body;
+  const newWord = await WordLists.create({ user, rank, word });
   res.status(201).json(newWord);
 }));
 

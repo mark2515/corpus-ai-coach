@@ -2,6 +2,7 @@ import { createAsyncThunk, createSelector, createSlice, current, PayloadAction }
 import { RootState } from "@/store";
 
 export interface WordLists {
+  user: string;
   rank: string;
   word: string;
 }
@@ -23,19 +24,21 @@ export const fetchWordLists = createAsyncThunk("wordLists/fetch", async (thunkAP
 })
 
 interface WordPayload {
-  word: string;
+  user: string;
   rank: string;
+  word: string;
 }
 
-export const saveWordLists = createAsyncThunk("wordLists/save", async ({ word, rank }: WordPayload, thunkAPI) => {
+export const saveWordLists = createAsyncThunk("wordLists/save", async ({ user, rank, word }: WordPayload, thunkAPI) => {
   const response = await fetch("http://localhost:5000/api/wordLists", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      word,
-      rank
+      user,
+      rank,
+      word
     })
   });
   const data = await response.json();
