@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { Button } from "@mantine/core";
 import { fetchWordLists, saveWordLists } from "@/slices/wordListsSlice";
-import { useAppDispatch, useAppSelector } from "@/store";
+import { useAppDispatch, useAppSelector, RootState } from "@/store";
 import { totalWordsSelector } from "@/slices/wordListsSlice";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
   const wordLists = useAppSelector((state) => state.wordList.wordLists);
   const totalWords = useAppSelector(totalWordsSelector);
+  const thisUser = useAppSelector((state) => state.user.users);
 
   useEffect(() => {
     dispatch(fetchWordLists());
@@ -21,9 +22,9 @@ export default function TestPage() {
         color="green"
         className="mb-2"
         fullWidth
-        onClick={() =>
-          dispatch(saveWordLists({ user: "user2_sub", rank: "100", word: "hello", }))
-        }
+        onClick={() => {
+          dispatch(saveWordLists({ user: thisUser[0].sub, rank: "100", word: "hello", }))
+        }}
       >
         Add a word
       </Button>

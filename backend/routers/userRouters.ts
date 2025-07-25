@@ -16,8 +16,8 @@ router.get('/', asyncHandler(async (req, res) => {
 //@route    POST /api/users/google-login
 //@access   public
 router.post('/google-login', asyncHandler(async (req, res) => {
-    const { name, email, picture, sub } = req.body;
-    if (!email || !sub) {
+    const { sub, name, email, picture } = req.body;
+    if (!sub || !email) {
       res.status(400);
       throw new Error('Missing required Google user info');
     }

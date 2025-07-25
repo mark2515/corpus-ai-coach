@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSelector, createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/store";
 
 export interface WordLists {
@@ -8,11 +8,11 @@ export interface WordLists {
 }
 
 interface WordListsState {
-    wordLists: WordLists[];
+  wordLists: WordLists[];
 }
 
 const initialState: WordListsState = {
-    wordLists: [],
+  wordLists: [],
 }
 
 export const fetchWordLists = createAsyncThunk("wordLists/fetch", async (thunkAPI) => {
@@ -68,6 +68,5 @@ export const { addWordLists } = WordListsSlice.actions;
 
 const words = (state: RootState) => state.wordList.wordLists;
 export const totalWordsSelector = createSelector([words], (words) => {
-  console.log("custom selectore runned");
   return words.length;
 });

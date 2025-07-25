@@ -30,16 +30,18 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useAppDispatch } from "@/store";
+import {  saveUsers } from "@/slices/usersSlice";
 
 type Props = {
   sessionId: string;
 };
 
 type GoogleUser = {
+  sub: string;
   name: string;
   email: string;
   picture: string;
-  sub: string;
 };
 
 export const Message = ({ sessionId }: Props) => {
@@ -53,6 +55,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [user, setUser] = useState<GoogleUser | null>(null);
+  const dispatch = useAppDispatch();
   const updateMessage = (msg: MessageList) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
@@ -188,11 +191,12 @@ export const Message = ({ sessionId }: Props) => {
                 Cookies.set("googleUser", JSON.stringify(decoded), { expires: 7 });
 
                 axios.post("http://localhost:5000/api/users/google-login", {
+                  sub: decoded.sub,
                   name: decoded.name,
                   email: decoded.email,
                   picture: decoded.picture,
-                  sub: decoded.sub,
                 }).then(() => {
+                  dispatch(saveUsers({ sub: decoded.sub, name: decoded.name, email: decoded.email, picture: decoded.picture }));
                   console.log("User saved");
                 }).catch((err) => {
                   console.error("Failed to save user", err);
@@ -204,6 +208,17 @@ export const Message = ({ sessionId }: Props) => {
           />
         </Modal>
         <Popover width={100} position="bottom" withArrow shadow="sm">
+          <Link href="/test" passHref legacyBehavior>
+            <Button
+              size="xs"
+              variant="light"
+              color="blue"
+              className="ml-4"
+              style={{ height: "2rem" }}
+            >
+              Go to /test
+            </Button>
+          </Link>
           <Popover.Target>
             <Button
               size="sm"
@@ -312,7 +327,7 @@ export const Message = ({ sessionId }: Props) => {
                     fullWidth 
                     variant="outline"
                     onClick={() => {
-                        setOpenedLoginPopover(false)
+                      setOpenedLoginPopover(false)
                     }}
                   >
                     Log in
