@@ -31,7 +31,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/store";
-import {  saveUsers } from "@/slices/usersSlice";
+import {  saveUser, setUserFromCookie, clearUser } from "@/slices/usersSlice";
 
 type Props = {
   sessionId: string;
@@ -73,6 +73,7 @@ export const Message = ({ sessionId }: Props) => {
       try {
         const parsedUser: GoogleUser = JSON.parse(storedUser);
         setUser(parsedUser);
+        dispatch(setUserFromCookie(parsedUser));
       } catch (e) {
         console.error("Failed to parse stored user", e);
       }
@@ -161,6 +162,7 @@ export const Message = ({ sessionId }: Props) => {
     Cookies.remove("googleUser");
     setUser(null);
     setOpenedLogoutPopover(false);
+    dispatch(clearUser());
   };
 
   return (
@@ -196,7 +198,8 @@ export const Message = ({ sessionId }: Props) => {
                   email: decoded.email,
                   picture: decoded.picture,
                 }).then(() => {
-                  dispatch(saveUsers({ sub: decoded.sub, name: decoded.name, email: decoded.email, picture: decoded.picture }));
+                  dispatch(saveUser({ sub: decoded.sub, name: decoded.name, email: decoded.email, picture: decoded.picture }));
+                  dispatch(setUserFromCookie(decoded));
                   console.log("User saved");
                 }).catch((err) => {
                   console.error("Failed to save user", err);

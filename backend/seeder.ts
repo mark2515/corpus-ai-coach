@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from "./config/db";
 import users from "./data/users";
 import wordLists from "./data/wordLists";
-import User from "./models/userModel";
+import User from "./models/usersModel";
 import WordLists from "./models/wordListsModel";
 
 dotenv.config();

@@ -1,19 +1,22 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/store";
+import Cookies from 'js-cookie';
 
-export interface Users {
+export interface User {
   sub: string;
   name: string;
   email: string;
   picture: string;
 }
 
-interface UsersState {
-  users: Users[];
+interface UserState {
+  currentUser: User | null;
 }
 
-const initialState: UsersState = {
-  users: [],
+const storedUser = Cookies.get('googleUser');
+
+const initialState: UserState = {
+  currentUser: storedUser ? JSON.parse(storedUser) : null,
 }
 
 export const fetchUsers = createAsyncThunk("users/fetch", async (thunkAPI) => {
@@ -31,7 +34,7 @@ interface UserPayload {
   picture: string;
 }
 
-export const saveUsers = createAsyncThunk("users/save", async ({ sub, name, email, picture }: UserPayload, thunkAPI) => {
+export const saveUser = createAsyncThunk("user/save", async ({ sub, name, email, picture }: UserPayload, thunkAPI) => {
   const response = await fetch("http://localhost:5000/api/users/google-login", {
     method: "POST",
     headers: {
@@ -52,24 +55,25 @@ export const UsersSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    addUsers: (state, action: PayloadAction<UserPayload>) => {
-      state.users.push(action.payload);
+    setUserFromCookie: (state, action: PayloadAction<User>) => {
+      state.currentUser = action.payload;
     },
+    clearUser: (state) => {
+      state.currentUser = null;
+    }
   },
   extraReducers(builder) {
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      state.users = action.payload;
-    });
-    builder.addCase(saveUsers.fulfilled, (state, action) => {
-      state.users.push(action.payload);
+      state.currentUser = action.payload;
     });
   },
 })
 
 export default UsersSlice.reducer;
-export const { addUsers } = UsersSlice.actions;
+export const { setUserFromCookie, clearUser } = UsersSlice.actions;
 
-const users = (state: RootState) => state.user.users;
-export const totalUsersSelector = createSelector([users], (users) => {
-  return users.length;
-});
+export const selectCurrentUser = (state: RootState) => state.user.currentUser;
+export const isLoggedInSelector = createSelector(
+  [selectCurrentUser],
+  (user) => !!user
+);
