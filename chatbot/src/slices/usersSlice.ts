@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 
 export interface User {
   _id: string,
-  sub: string;
   name: string;
   email: string;
   picture: string;
@@ -30,13 +29,12 @@ export const fetchUsers = createAsyncThunk("users/fetch", async (thunkAPI) => {
 
 interface UserPayload {
   _id: string,
-  sub: string;
   name: string;
   email: string;
   picture: string;
 }
 
-export const saveUser = createAsyncThunk("user/save", async ({ _id, sub, name, email, picture }: UserPayload, thunkAPI) => {
+export const saveUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload, thunkAPI) => {
   const response = await fetch("http://localhost:5000/api/users/google-login", {
     method: "POST",
     headers: {
@@ -44,7 +42,6 @@ export const saveUser = createAsyncThunk("user/save", async ({ _id, sub, name, e
     },
     body: JSON.stringify({
       _id,
-      sub,
       name,
       email,
       picture

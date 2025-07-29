@@ -16,14 +16,14 @@ router.get('/', asyncHandler(async (req, res) => {
 //@route    POST /api/users/google-login
 //@access   public
 router.post('/google-login', asyncHandler(async (req, res) => {
-    const { sub, name, email, picture } = req.body;
-    if (!sub || !email) {
+    const { name, email, picture } = req.body;
+    if (!email) {
       res.status(400);
       throw new Error('Missing required Google user info');
     }
     const user = await User.findOneAndUpdate(
-      { sub },
-      { name, email, picture },
+      { email },
+      { name, picture },
       { new: true, upsert: true }
     );
     res.status(200).json(user);

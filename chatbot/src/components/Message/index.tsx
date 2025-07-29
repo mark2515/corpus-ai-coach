@@ -39,7 +39,6 @@ type Props = {
 
 type GoogleUser = {
   _id: string;
-  sub: string;
   name: string;
   email: string;
   picture: string;
@@ -189,19 +188,18 @@ export const Message = ({ sessionId }: Props) => {
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {
                 const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
-                setUser(decoded);
-                setOpenedModal(false);
 
                 axios.post("http://localhost:5000/api/users/google-login", {
-                  sub: decoded.sub,
                   name: decoded.name,
                   email: decoded.email,
                   picture: decoded.picture,
                 }).then((response) => {
                   const userData = response.data;
-                  dispatch(saveUser({ _id: userData._id, sub: userData.sub, name: userData.name, email: userData.email, picture: userData.picture }));
+                  dispatch(saveUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
                   Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
                   dispatch(setUserFromCookie(userData));
+                  setUser(userData);
+                  setOpenedModal(false);
                   console.log("User saved");
                 }).catch((err) => {
                   console.error("Failed to save user", err);
