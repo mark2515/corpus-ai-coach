@@ -3,8 +3,9 @@ import mongoose from 'mongoose'
 const wordListsSchema = new mongoose.Schema(
 {
     user: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
+        ref: 'User'
     },
     rank: {
         type: String,

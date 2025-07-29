@@ -17,7 +17,6 @@
     "server": "nodemon backend/server.ts",
     "client": "npm run dev --prefix chatbot",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "data:import": "ts-node backend/seeder",
     "data:destroy": "ts-node backend/seeder -d"
   },
   "author": "Mark",

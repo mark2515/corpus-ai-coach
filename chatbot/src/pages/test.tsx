@@ -4,6 +4,7 @@ import { fetchWordLists, saveWordLists } from "@/slices/wordListsSlice";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { totalWordsSelector } from "@/slices/wordListsSlice";
 import { selectCurrentUser } from "@/slices/usersSlice";
+import Link from "next/link";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
@@ -23,7 +24,7 @@ export default function TestPage() {
 
     dispatch(
       saveWordLists({
-        user: currentUser.sub,
+        user: currentUser._id,
         rank: "100",
         word: "hello",
       })
@@ -51,6 +52,17 @@ export default function TestPage() {
         ))}
       </ul>
       <div>Total Words Count: {totalWords}</div>
+      <Link href="/" passHref>
+        <Button
+          size="xs"
+          variant="light"
+          color="blue"
+          className="mb-4"
+          fullWidth
+        >
+          Back to Home
+        </Button>
+      </Link>
     </div>
   );
 }
