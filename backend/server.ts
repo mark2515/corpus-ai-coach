@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv'
 import connectDB from "./config/db";
-import usersRoutes from "./routers/usersRouters";
-import wordListsRoutes from "./routers/wordListsRouters";
+import usersRoute from "./routers/usersRouter";
+import wordListsRoute from "./routers/wordListsRouter";
 import { notFound, errorHandler } from './middleware/errorMiddleware'
 
 const app = express();
@@ -21,9 +21,9 @@ app.get("/", (req, res) => {
   res.send("Hello World from TypeScript!");
 });
 
-app.use('/api/users', usersRoutes);
+app.use('/api/users', usersRoute);
 
-app.use('/api/wordLists', wordListsRoutes);
+app.use('/api/wordLists', wordListsRoute);
 
 app.use(notFound)
 app.use(errorHandler)
