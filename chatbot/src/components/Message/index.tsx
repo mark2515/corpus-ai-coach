@@ -44,6 +44,13 @@ type GoogleUser = {
   picture: string;
 };
 
+const guestUser: GoogleUser = {
+  _id: "guest-id",
+  name: "Guest",
+  email: "guest@example.com",
+  picture: "/guest.png",
+};
+
 export const Message = ({ sessionId }: Props) => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -180,10 +187,10 @@ export const Message = ({ sessionId }: Props) => {
         <Modal
           opened={openedModal}
           onClose={() => setOpenedModal(false)}
-          title="Log In"
+          title="Sign In"
           centered
         >
-          <p>Please enter your credentials to continue.</p>
+          <p>Choose a method to continue.</p>
           <GoogleLogin 
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {
@@ -294,11 +301,12 @@ export const Message = ({ sessionId }: Props) => {
                   size="sm"
                   variant="subtle"
                   className="px-1"
+                  onClick={() => setUser(guestUser)}
               >
-                Log in
+                Guest Login
               </Button>
               <Button variant="filled" style={{ color: 'white', backgroundColor: 'teal' }} onClick={() => setOpenedModal(true)}>
-                Get Started Now
+                Sign In With Google
               </Button>
             </div>
             <div className="flex md:hidden items-center">
@@ -320,20 +328,20 @@ export const Message = ({ sessionId }: Props) => {
                     variant="subtle"
                     className="mb-2"
                     onClick={() => {
-                      setOpenedModal(true) 
                       setOpenedLoginPopover(false)
                     }}
                   >
-                    Get Started Now
+                    Guest Login
                   </Button>
                   <Button 
                     fullWidth 
                     variant="outline"
                     onClick={() => {
+                      setOpenedModal(true) 
                       setOpenedLoginPopover(false)
                     }}
                   >
-                    Log in
+                    Sign In With Google
                   </Button>
                 </Popover.Dropdown>
               </Popover>
