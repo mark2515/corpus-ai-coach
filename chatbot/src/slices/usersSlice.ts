@@ -19,7 +19,7 @@ const initialState: UserState = {
   currentUser: storedUser ? JSON.parse(storedUser) : null,
 }
 
-export const fetchUsers = createAsyncThunk("users/fetch", async (thunkAPI) => {
+export const fetchUsers = createAsyncThunk("users/fetch", async () => {
   const response = await fetch("http://localhost:5000/api/users", {
     method: "GET"
   });
@@ -34,7 +34,7 @@ interface UserPayload {
   picture: string;
 }
 
-export const saveUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload, thunkAPI) => {
+export const saveUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload) => {
   const response = await fetch("http://localhost:5000/api/users/google-login", {
     method: "POST",
     headers: {
@@ -55,16 +55,13 @@ export const UsersSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUserFromCookie: (state, action: PayloadAction<User>) => {
-      state.currentUser = action.payload;
-    },
     clearUser: (state) => {
       state.currentUser = null;
     }
   },
   extraReducers(builder) {
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = action.payload[0] || null;
     });
   },
 })

@@ -31,7 +31,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/store";
-import {  saveUser, setUserFromCookie, clearUser } from "@/slices/usersSlice";
+import {  saveUser, clearUser } from "@/slices/usersSlice";
 import { User, GoogleUser } from "../../types/index";
 
 type Props = {
@@ -72,7 +72,6 @@ export const Message = ({ sessionId }: Props) => {
       try {
         const parsedUser: GoogleUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        dispatch(setUserFromCookie(parsedUser));
       } catch (e) {
         console.error("Failed to parse stored user", e);
       }
@@ -196,7 +195,6 @@ export const Message = ({ sessionId }: Props) => {
                   const userData = response.data;
                   dispatch(saveUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
                   Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
-                  dispatch(setUserFromCookie(userData));
                   setUser(userData);
                   setOpenedModal(false);
                   console.log("User saved");
@@ -293,7 +291,7 @@ export const Message = ({ sessionId }: Props) => {
                   size="sm"
                   variant="subtle"
                   className="px-1"
-                  onClick={() => setUser(guestUser)}
+                  onClick={() => {}}
               >
                 Guest Login
               </Button>
