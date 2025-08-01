@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
-  res.send("Hello World from TypeScript!");
+  res.send("The server is running");
 });
 
 app.use('/api/users', usersRoute);

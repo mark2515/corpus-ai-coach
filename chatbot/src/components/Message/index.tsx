@@ -32,22 +32,14 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/store";
 import {  saveUser, setUserFromCookie, clearUser } from "@/slices/usersSlice";
+import { User, GoogleUser } from "../../types/index";
 
 type Props = {
   sessionId: string;
 };
 
-type GoogleUser = {
-  _id: string;
-  name: string;
-  email: string;
-  picture: string;
-};
-
-const guestUser: GoogleUser = {
-  _id: "guest-id",
+const guestUser: User = {
   name: "Guest",
-  email: "guest@example.com",
   picture: "/guest.png",
 };
 
