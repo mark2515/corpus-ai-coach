@@ -53,8 +53,10 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
+  const [guest, setGuest] = useState<User | null>(null);
   const [user, setUser] = useState<GoogleUser | null>(null);
   const dispatch = useAppDispatch();
+
   const updateMessage = (msg: MessageList) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
@@ -70,13 +72,12 @@ export const Message = ({ sessionId }: Props) => {
     const storedUser = Cookies.get("googleUser");
     if (storedUser) {
       try {
-        const parsedUser: GoogleUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (e) {
-        console.error("Failed to parse stored user", e);
-      }
+        setUser(JSON.parse(storedUser));
+      } catch {}
     }
+  }, []);
 
+  useEffect(() => {
     const session = chatStorage.getSession(sessionId);
     setAssistant(session?.assistant);
     const msg = chatStorage.getMessage(sessionId);
@@ -159,6 +160,7 @@ export const Message = ({ sessionId }: Props) => {
   const onLogout = () => {
     Cookies.remove("googleUser");
     setUser(null);
+    setGuest(null);
     setOpenedLogoutPopover(false);
     dispatch(clearUser());
   };
@@ -252,7 +254,7 @@ export const Message = ({ sessionId }: Props) => {
           ></AssistantSelect>
           <ThemeSwitch></ThemeSwitch>
         </div>
-        {user ? (
+        {user || guest ? (
           <Popover
             opened={openedLogoutPopover}
             onClose={() => setOpenedLogoutPopover(false)}
@@ -262,16 +264,16 @@ export const Message = ({ sessionId }: Props) => {
           >
             <Popover.Target>
               <img
-                src={user.picture}
-                alt={user.name}
+                src={(user || guest)?.picture}
+                alt={(user || guest)?.name}
                 className="w-8 h-8 rounded-full border cursor-pointer"
-                title={user.name}
+                title={(user || guest)?.name}
                 onClick={() => setOpenedLogoutPopover((v) => !v)}
               />
             </Popover.Target>
             <Popover.Dropdown>
               <div className="flex flex-col items-start">
-                <div className="mb-2 text-sm text-gray-700">{user.name}</div>
+                <div className="mb-2 text-sm text-gray-700">{(user || guest)?.name}</div>
                 <Button
                   size="xs"
                   variant="outline"
@@ -291,7 +293,7 @@ export const Message = ({ sessionId }: Props) => {
                   size="sm"
                   variant="subtle"
                   className="px-1"
-                  onClick={() => {}}
+                  onClick={() => setGuest(guestUser)}
               >
                 Guest Login
               </Button>
@@ -318,6 +320,7 @@ export const Message = ({ sessionId }: Props) => {
                     variant="subtle"
                     className="mb-2"
                     onClick={() => {
+                      setGuest(guestUser)
                       setOpenedLoginPopover(false)
                     }}
                   >

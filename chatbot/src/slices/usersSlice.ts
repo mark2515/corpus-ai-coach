@@ -67,7 +67,7 @@ export const UsersSlice = createSlice({
 })
 
 export default UsersSlice.reducer;
-export const { setUserFromCookie, clearUser } = UsersSlice.actions;
+export const { clearUser } = UsersSlice.actions;
 
 export const selectCurrentUser = (state: RootState) => state.user.currentUser;
 export const isLoggedInSelector = createSelector(
