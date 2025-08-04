@@ -31,7 +31,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/store";
-import {  saveUser, clearUser } from "@/slices/usersSlice";
+import { saveGoogleUser, clearUser } from "@/slices/usersSlice";
 import { User, GoogleUser } from "../../types/index";
 
 type Props = {
@@ -41,6 +41,7 @@ type Props = {
 const guestUser: User = {
   name: "Guest",
   picture: "/guest.png",
+  isGuest: true,
 };
 
 export const Message = ({ sessionId }: Props) => {
@@ -195,7 +196,7 @@ export const Message = ({ sessionId }: Props) => {
                   picture: decoded.picture,
                 }).then((response) => {
                   const userData = response.data;
-                  dispatch(saveUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
+                  dispatch(saveGoogleUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
                   Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
                   setUser(userData);
                   setOpenedModal(false);

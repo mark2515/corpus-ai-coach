@@ -34,7 +34,7 @@ interface UserPayload {
   picture: string;
 }
 
-export const saveUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload) => {
+export const saveGoogleUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload) => {
   const response = await fetch("http://localhost:5000/api/users/google-login", {
     method: "POST",
     headers: {
@@ -44,7 +44,7 @@ export const saveUser = createAsyncThunk("user/save", async ({ _id, name, email,
       _id,
       name,
       email,
-      picture
+      picture,
     })
   });
   const data = await response.json();
@@ -62,6 +62,9 @@ export const UsersSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       state.currentUser = action.payload[0] || null;
+    });
+    builder.addCase(saveGoogleUser.fulfilled, (state, action) => {
+      state.currentUser = action.payload;
     });
   },
 })

@@ -23,7 +23,13 @@ const addGoogleUser = asyncHandler(async (req, res) => {
         { name, picture },
         { new: true, upsert: true }
     );
-    res.status(200).json(user);
+
+    const userWithGuestFlag = {
+        ...user.toObject(),
+        isGuest: false,
+    };
+
+    res.status(200).json(userWithGuestFlag);
 })
 
 export { getUsers, addGoogleUser };
