@@ -36,12 +36,9 @@ export type AssistantList = Assistant[];
 export type EditAssistant = Omit<Assistant, "id"> & Partial<Pick<Assistant, "id">>;
 
 export type User = {
+  _id: string;
   name: string;
+  email: string;
   picture: string;
   isGuest: boolean;
-};
-
-export type GoogleUser = User & {
-  _id: string;
-  email: string;
 };

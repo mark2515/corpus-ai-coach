@@ -6,18 +6,20 @@ import { totalWordsSelector } from "@/slices/wordListsSlice";
 import { selectCurrentUser } from "@/slices/usersSlice";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { GoogleUser } from "@/types";
+import { User } from "@/types";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
   const wordLists = useAppSelector((state) => state.wordList.wordLists);
   const totalWords = useAppSelector(totalWordsSelector);
-  const storedUser = Cookies.get("googleUser");
-  const currentUser: GoogleUser | null = storedUser ? JSON.parse(storedUser) : null;
+  const googleUser = Cookies.get("googleUser");
+  const guestUser = Cookies.get("guestUser");
+  const currentUser: User | null = googleUser ? JSON.parse(googleUser) : null;
 
 
   useEffect(() => {
     dispatch(fetchWordLists());
+    console.log(guestUser);
   }, [dispatch]);
 
   const handleAddWord = () => {

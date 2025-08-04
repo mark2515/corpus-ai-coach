@@ -7,13 +7,17 @@ export interface User {
   name: string;
   email: string;
   picture: string;
+  isGuest: boolean;
 }
 
 interface UserState {
   currentUser: User | null;
 }
 
-const storedUser = Cookies.get('googleUser');
+const storedGuestUser = Cookies.get("guestUser");
+const storedGoogleUser = Cookies.get("googleUser");
+
+const storedUser = storedGuestUser || storedGoogleUser;
 
 const initialState: UserState = {
   currentUser: storedUser ? JSON.parse(storedUser) : null,
@@ -34,7 +38,24 @@ interface UserPayload {
   picture: string;
 }
 
-export const saveGoogleUser = createAsyncThunk("user/save", async ({ _id, name, email, picture }: UserPayload) => {
+export const saveGuestUser = createAsyncThunk("guestUser/save", async ({ _id, name, email, picture }: UserPayload) => {
+  const response = await fetch("http://localhost:5000/api/users/guest-login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      _id,
+      name,
+      email,
+      picture,
+    })
+  });
+  const data = await response.json();
+  return data;
+})
+
+export const saveGoogleUser = createAsyncThunk("googleUser/save", async ({ _id, name, email, picture }: UserPayload) => {
   const response = await fetch("http://localhost:5000/api/users/google-login", {
     method: "POST",
     headers: {
@@ -62,6 +83,9 @@ export const UsersSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       state.currentUser = action.payload[0] || null;
+    });
+    builder.addCase(saveGuestUser.fulfilled, (state, action) => {
+      state.currentUser = action.payload;
     });
     builder.addCase(saveGoogleUser.fulfilled, (state, action) => {
       state.currentUser = action.payload;

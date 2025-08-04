@@ -1,9 +1,11 @@
 import express from 'express';
-import { getUsers, addGoogleUser } from '../controllers/usersController';
+import { getUsers, addGuestUser, addGoogleUser } from '../controllers/usersController';
 
 const router = express.Router();
 
 router.route('/').get(getUsers);
+
+router.route('/guest-login').post(addGuestUser);
 
 router.route('/google-login').post(addGoogleUser);
 

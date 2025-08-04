@@ -9,6 +9,15 @@ const getUsers = asyncHandler(async (req, res) => {
   res.json(users);
 })
 
+//@desc     create a guest user
+//@route    POST /api/users/guest-login
+//@access   public
+const addGuestUser = asyncHandler(async (req, res) => {
+    const { name, email, picture } = req.body;
+    const isGuest = true;
+    res.status(200).json({ name, email, picture, isGuest });
+})
+
 //@desc     create or update a Google user
 //@route    POST /api/users/google-login
 //@access   public
@@ -32,5 +41,5 @@ const addGoogleUser = asyncHandler(async (req, res) => {
     res.status(200).json(userWithGuestFlag);
 })
 
-export { getUsers, addGoogleUser };
+export { getUsers, addGuestUser, addGoogleUser };
 

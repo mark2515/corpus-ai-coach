@@ -31,15 +31,17 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/store";
-import { saveGoogleUser, clearUser } from "@/slices/usersSlice";
-import { User, GoogleUser } from "../../types/index";
+import { saveGuestUser, saveGoogleUser, clearUser } from "@/slices/usersSlice";
+import { User } from "../../types/index";
 
 type Props = {
   sessionId: string;
 };
 
 const guestUser: User = {
+  _id: "guest-id",
   name: "Guest",
+  email: "guest@example.com",
   picture: "/guest.png",
   isGuest: true,
 };
@@ -55,7 +57,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [guest, setGuest] = useState<User | null>(null);
-  const [user, setUser] = useState<GoogleUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const dispatch = useAppDispatch();
 
   const updateMessage = (msg: MessageList) => {
@@ -131,6 +133,22 @@ export const Message = ({ sessionId }: Props) => {
     setMessages(newList);
   };
 
+  const handleGuestLogin = async () => {
+    axios.post("http://localhost:5000/api/users/guest-login", {
+      name: guestUser.name,
+      email: guestUser.email,
+      picture: guestUser.picture,
+    }).then((response) => {
+      const userData = response.data;
+      dispatch(saveGuestUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
+      Cookies.set("guestUser", JSON.stringify(userData), { expires: 7 });
+      setGuest(guestUser)
+      console.log("User saved");
+    }).catch((err) => {
+      console.error("Failed to save user", err);
+    });
+  };
+
   const setMessages = (msg: MessageList) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
@@ -188,7 +206,7 @@ export const Message = ({ sessionId }: Props) => {
           <GoogleLogin 
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {
-                const decoded = jwtDecode<GoogleUser>(credentialResponse.credential);
+                const decoded = jwtDecode<User>(credentialResponse.credential);
 
                 axios.post("http://localhost:5000/api/users/google-login", {
                   name: decoded.name,
@@ -294,7 +312,7 @@ export const Message = ({ sessionId }: Props) => {
                   size="sm"
                   variant="subtle"
                   className="px-1"
-                  onClick={() => setGuest(guestUser)}
+                  onClick={handleGuestLogin}
               >
                 Guest Login
               </Button>
@@ -320,9 +338,9 @@ export const Message = ({ sessionId }: Props) => {
                     fullWidth
                     variant="subtle"
                     className="mb-2"
-                    onClick={() => {
-                      setGuest(guestUser)
-                      setOpenedLoginPopover(false)
+                    onClick={async () => {
+                      await handleGuestLogin();
+                      setOpenedLoginPopover(false);
                     }}
                   >
                     Guest Login
