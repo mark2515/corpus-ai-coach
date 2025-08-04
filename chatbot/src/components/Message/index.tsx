@@ -30,7 +30,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useAppDispatch } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/slices/usersSlice";
 import { saveGuestUser, saveGoogleUser, clearUser } from "@/slices/usersSlice";
 import { User } from "../../types/index";
 
@@ -56,8 +57,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
-  const [guest, setGuest] = useState<User | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const currentUser = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
 
   const updateMessage = (msg: MessageList) => {
@@ -72,15 +72,6 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   useEffect(() => {
-    const storedUser = Cookies.get("googleUser");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {}
-    }
-  }, []);
-
-  useEffect(() => {
     const session = chatStorage.getSession(sessionId);
     setAssistant(session?.assistant);
     const msg = chatStorage.getMessage(sessionId);
@@ -89,6 +80,21 @@ export const Message = ({ sessionId }: Props) => {
       chatService.cancel();
     }
   }, [sessionId, mode]);
+
+  useEffect(() => {
+    const storedGuestUser = Cookies.get("guestUser");
+    const storedGoogleUser = Cookies.get("googleUser");
+    const storedUser = storedGuestUser || storedGoogleUser;
+
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser.isGuest) {
+        dispatch(saveGuestUser(parsedUser));
+      } else {
+        dispatch(saveGoogleUser(parsedUser));
+      }
+    }
+  }, [dispatch]);
 
   const onAssistantChange = (assistant: Assistant) => {
     setAssistant(assistant);
@@ -142,7 +148,6 @@ export const Message = ({ sessionId }: Props) => {
       const userData = response.data;
       dispatch(saveGuestUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
       Cookies.set("guestUser", JSON.stringify(userData), { expires: 7 });
-      setGuest(guestUser)
       console.log("User saved");
     }).catch((err) => {
       console.error("Failed to save user", err);
@@ -177,11 +182,10 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   const onLogout = () => {
-    Cookies.remove("googleUser");
-    setUser(null);
-    setGuest(null);
-    setOpenedLogoutPopover(false);
     dispatch(clearUser());
+    Cookies.remove("guestUser");
+    Cookies.remove("googleUser");
+    setOpenedLogoutPopover(false);
   };
 
   return (
@@ -216,7 +220,6 @@ export const Message = ({ sessionId }: Props) => {
                   const userData = response.data;
                   dispatch(saveGoogleUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
                   Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
-                  setUser(userData);
                   setOpenedModal(false);
                   console.log("User saved");
                 }).catch((err) => {
@@ -273,7 +276,7 @@ export const Message = ({ sessionId }: Props) => {
           ></AssistantSelect>
           <ThemeSwitch></ThemeSwitch>
         </div>
-        {user || guest ? (
+        {currentUser ? (
           <Popover
             opened={openedLogoutPopover}
             onClose={() => setOpenedLogoutPopover(false)}
@@ -283,16 +286,16 @@ export const Message = ({ sessionId }: Props) => {
           >
             <Popover.Target>
               <img
-                src={(user || guest)?.picture}
-                alt={(user || guest)?.name}
+                src={currentUser?.picture}
+                alt={currentUser?.name}
                 className="w-8 h-8 rounded-full border cursor-pointer"
-                title={(user || guest)?.name}
+                title={currentUser?.name}
                 onClick={() => setOpenedLogoutPopover((v) => !v)}
               />
             </Popover.Target>
             <Popover.Dropdown>
               <div className="flex flex-col items-start">
-                <div className="mb-2 text-sm text-gray-700">{(user || guest)?.name}</div>
+                <div className="mb-2 text-sm text-gray-700">{currentUser?.name}</div>
                 <Button
                   size="xs"
                   variant="outline"

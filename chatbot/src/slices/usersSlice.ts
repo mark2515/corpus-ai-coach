@@ -14,13 +14,8 @@ interface UserState {
   currentUser: User | null;
 }
 
-const storedGuestUser = Cookies.get("guestUser");
-const storedGoogleUser = Cookies.get("googleUser");
-
-const storedUser = storedGuestUser || storedGoogleUser;
-
 const initialState: UserState = {
-  currentUser: storedUser ? JSON.parse(storedUser) : null,
+  currentUser: null,
 }
 
 export const fetchUsers = createAsyncThunk("users/fetch", async () => {
