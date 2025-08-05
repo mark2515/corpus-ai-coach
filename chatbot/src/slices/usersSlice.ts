@@ -92,7 +92,3 @@ export default UsersSlice.reducer;
 export const { clearUser } = UsersSlice.actions;
 
 export const selectCurrentUser = (state: RootState) => state.user.currentUser;
-export const isLoggedInSelector = createSelector(
-  [selectCurrentUser],
-  (user) => !!user
-);

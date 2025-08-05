@@ -31,8 +31,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/slices/usersSlice";
-import { saveGuestUser, saveGoogleUser, clearUser } from "@/slices/usersSlice";
+import { saveGuestUser, saveGoogleUser, clearUser, selectCurrentUser } from "@/slices/usersSlice";
 import { User } from "../../types/index";
 
 type Props = {
@@ -139,21 +138,6 @@ export const Message = ({ sessionId }: Props) => {
     setMessages(newList);
   };
 
-  const handleGuestLogin = async () => {
-    axios.post("http://localhost:5000/api/users/guest-login", {
-      name: guestUser.name,
-      email: guestUser.email,
-      picture: guestUser.picture,
-    }).then((response) => {
-      const userData = response.data;
-      dispatch(saveGuestUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
-      Cookies.set("guestUser", JSON.stringify(userData), { expires: 7 });
-      console.log("User saved");
-    }).catch((err) => {
-      console.error("Failed to save user", err);
-    });
-  };
-
   const setMessages = (msg: MessageList) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
@@ -186,6 +170,21 @@ export const Message = ({ sessionId }: Props) => {
     Cookies.remove("guestUser");
     Cookies.remove("googleUser");
     setOpenedLogoutPopover(false);
+  };
+
+  const handleGuestLogin = async () => {
+    axios.post("http://localhost:5000/api/users/guest-login", {
+      name: guestUser.name,
+      email: guestUser.email,
+      picture: guestUser.picture,
+    }).then((response) => {
+      const userData = response.data;
+      dispatch(saveGuestUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
+      Cookies.set("guestUser", JSON.stringify(userData), { expires: 7 });
+      console.log("User saved");
+    }).catch((err) => {
+      console.error("Failed to save user", err);
+    });
   };
 
   return (
