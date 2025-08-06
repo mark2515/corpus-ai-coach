@@ -156,6 +156,14 @@ export const Message = ({ sessionId }: Props) => {
       },
     ];
     setMessages(list);
+    const newMsg = {
+      user: currentUser?._id,
+      role: "user",
+      content: prompt,
+    };
+    axios.post("http://localhost:5000/api/messages", newMsg)
+    .catch((err) => console.error("Failed to save user message:", err));
+    
     setLoading(true);
     chatService.getStream({
       prompt,
