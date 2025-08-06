@@ -1,22 +1,22 @@
 import mongoose from 'mongoose'
 
-const wordListsSchema = new mongoose.Schema(
+const messagesSchema = new mongoose.Schema(
 {
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },
-    rank: {
+    role: {
         type: String,
         required: true,
     },
-    word: {
+    content: {
         type: String,
         required: true,
-    }
+    },
 }, { timestamps: true })
 
-const WordLists = mongoose.model('Word', wordListsSchema)
+const Messages = mongoose.model('Message', messagesSchema)
 
-export default WordLists
+export default Messages

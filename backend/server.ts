@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import connectDB from "./config/db";
 import usersRoute from "./routers/usersRouter";
 import wordListsRoute from "./routers/wordListsRouter";
+import messagesRoute from "./routers/messagesRouter";
 import { notFound, errorHandler } from './middleware/errorMiddleware'
 
 const app = express();
@@ -24,6 +25,8 @@ app.get("/", (req, res) => {
 app.use('/api/users', usersRoute);
 
 app.use('/api/wordLists', wordListsRoute);
+
+app.use('/api/messages', messagesRoute);
 
 app.use(notFound)
 app.use(errorHandler)

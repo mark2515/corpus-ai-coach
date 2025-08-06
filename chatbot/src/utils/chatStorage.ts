@@ -106,7 +106,3 @@ export const removeSession = (id: string) => {
   updateSessionStore(newList);
   return newList;
 };
-
-export function clearLocal() {
-  throw new Error("Function not implemented.");
-}
