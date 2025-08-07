@@ -143,7 +143,7 @@ export const Message = ({ sessionId }: Props) => {
     chatStorage.updateMessage(sessionId, msg);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (loading) {
       return chatService.cancel();
     }
@@ -161,8 +161,11 @@ export const Message = ({ sessionId }: Props) => {
       role: "user",
       content: prompt,
     };
-    axios.post("http://localhost:5000/api/messages", newMsg)
-    .catch((err) => console.error("Failed to save user message:", err));
+    try {
+      await axios.post("http://localhost:5000/api/messages", newMsg);
+    } catch (err) {
+      console.error("Failed to save user message:", err);
+    }
     
     setLoading(true);
     chatService.getStream({
@@ -181,18 +184,25 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   const handleGuestLogin = async () => {
-    axios.post("http://localhost:5000/api/users/guest-login", {
-      name: guestUser.name,
-      email: guestUser.email,
-      picture: guestUser.picture,
-    }).then((response) => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/users/guest-login", {
+        name: guestUser.name,
+        email: guestUser.email,
+        picture: guestUser.picture,
+      });
+
       const userData = response.data;
-      dispatch(saveGuestUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
+      dispatch(saveGuestUser({
+        _id: userData._id,
+        name: userData.name,
+        email: userData.email,
+        picture: userData.picture
+      }));
       Cookies.set("guestUser", JSON.stringify(userData), { expires: 7 });
       console.log("User saved");
-    }).catch((err) => {
+    } catch (err) {
       console.error("Failed to save user", err);
-    });
+    }
   };
 
   return (
@@ -215,26 +225,33 @@ export const Message = ({ sessionId }: Props) => {
         >
           <p>Choose a method to continue.</p>
           <GoogleLogin 
-            onSuccess={(credentialResponse) => {
+            onSuccess={async (credentialResponse) => {
               if (credentialResponse.credential) {
                 const decoded = jwtDecode<User>(credentialResponse.credential);
 
-                axios.post("http://localhost:5000/api/users/google-login", {
-                  name: decoded.name,
-                  email: decoded.email,
-                  picture: decoded.picture,
-                }).then((response) => {
+                try {
+                  const response = await axios.post("http://localhost:5000/api/users/google-login", {
+                    name: decoded.name,
+                    email: decoded.email,
+                    picture: decoded.picture,
+                  });
+
                   const userData = response.data;
-                  dispatch(saveGoogleUser({ _id: userData._id, name: userData.name, email: userData.email, picture: userData.picture }));
+                  dispatch(saveGoogleUser({
+                    _id: userData._id,
+                    name: userData.name,
+                    email: userData.email,
+                    picture: userData.picture,
+                  }));
                   Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
                   setOpenedModal(false);
                   console.log("User saved");
-                }).catch((err) => {
+                } catch (err) {
                   console.error("Failed to save user", err);
-                });
+                }
               }
             }}
-            onError={() => console.log("Login Failed")} 
+            onError={() => console.log("Login Failed")}
             auto_select={true}
           />
         </Modal>
