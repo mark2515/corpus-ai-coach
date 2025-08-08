@@ -1,4 +1,4 @@
-import { useEffect, useState, KeyboardEvent } from "react";
+import { useEffect, useState, useRef, KeyboardEvent } from "react";
 import chatService from "@/utils/chatService";
 import { Markdown } from "../Markdown";
 import { Voice } from "../Voice";
@@ -57,6 +57,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const currentUser = useAppSelector(selectCurrentUser);
+  const messageRef = useRef<MessageList>([]);
   const dispatch = useAppDispatch();
 
   const updateMessage = (msg: MessageList) => {
@@ -140,7 +141,24 @@ export const Message = ({ sessionId }: Props) => {
 
   const setMessages = (msg: MessageList) => {
     setMessage(msg);
+    messageRef.current = msg;
     chatStorage.updateMessage(sessionId, msg);
+  };
+
+  const saveMessageToDB = async (
+    role: "user" | "assistant",
+    content: string,
+  ) => {
+    if ( !currentUser || currentUser?.isGuest) return;
+    try {
+      await axios.post("http://localhost:5000/api/messages", {
+        user: currentUser?._id,
+        role,
+        content,
+      });
+    } catch (err) {
+      console.error(`Failed to save ${role} message:`, err);
+    }
   };
 
   const onSubmit = async () => {
@@ -156,16 +174,7 @@ export const Message = ({ sessionId }: Props) => {
       },
     ];
     setMessages(list);
-    const newMsg = {
-      user: currentUser?._id,
-      role: "user",
-      content: prompt,
-    };
-    try {
-      await axios.post("http://localhost:5000/api/messages", newMsg);
-    } catch (err) {
-      console.error("Failed to save user message:", err);
-    }
+    await saveMessageToDB("user", prompt);
     
     setLoading(true);
     chatService.getStream({
