@@ -64,10 +64,26 @@ export const Message = ({ sessionId }: Props) => {
     setMessage(msg);
     chatStorage.updateMessage(sessionId, msg);
   };
+
   chatService.actions = {
-    onCompleting: (sug) => setSuggestion(sug),
-    onCompleted: () => {
+    onCompleting: (partial) => {
+      setSuggestion(partial);
+    },
+    onCompleted: async (finalText) => {
       setLoading(false);
+      if (!finalText) return;
+
+      const list = [...messageRef.current];
+      const last = list[list.length - 1];
+
+      if (last && last.role === "assistant") {
+        list[list.length - 1] = { ...last, content: finalText };
+      } else {
+        list.push({ role: "assistant", content: finalText });
+      }
+
+      setMessages(list);
+      await saveMessageToDB("assistant", finalText);
     },
   };
 
