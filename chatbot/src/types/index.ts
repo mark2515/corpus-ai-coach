@@ -24,6 +24,7 @@ export type ChatLogsStorageType = {
 export type Assistant = {
   id: string;
   name: string;
+  model?: string;
   description?: string;
   prompt: string;
   temperature?: number;

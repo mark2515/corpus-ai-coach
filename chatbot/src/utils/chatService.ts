@@ -1,11 +1,8 @@
-import { Message } from "@/types";
+import { Message, Assistant } from "@/types";
 type StreamParams = {
   prompt: string;
   history?: Message[];
-  options?: {
-    temperature?: number;
-    max_tokens?: number;
-  };
+  options?: Partial<Assistant>;
 };
 
 type Actions = {

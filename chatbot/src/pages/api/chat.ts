@@ -19,7 +19,7 @@ export default async function handler(req: NextRequest) {
   const { prompt, history = [], options = {} } = await req.json();
   const { max_tokens, temperature } = options;
   const data = {
-    model: "gpt-3.5-turbo",
+    model: options.model,
     messages: [
       {
         role: "system",

@@ -1,6 +1,6 @@
 import { EditAssistant } from "@/types";
 import React, { FormEvent, useState, useEffect } from "react";
-import { Button, Input, Textarea, NumberInput } from "@mantine/core";
+import { Button, Input, Textarea, NumberInput, Select } from "@mantine/core";
 import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
 import assistantStore from "@/utils/assistantStore";
 const { Wrapper } = Input;
@@ -52,6 +52,29 @@ export const AssistantConfig = ({ assistant, save, remove }: Props) => {
             name="name"
             onChange={onChange}
           ></Input>
+        </Wrapper>
+
+        <Wrapper
+          label="Model"
+          description="Select the OpenAI model to use"
+        >
+          <Select
+            variant="filled"
+            data={[
+              { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
+              { value: "gpt-4o-mini", label: "gpt-4o-mini" },
+              { value: "gpt-4o", label: "gpt-4o" },
+              { value: "gpt-4-turbo", label: "gpt-4-turbo" },
+              { value: "gpt-4", label: "gpt-4" },
+            ]}
+            value={data.model ?? "gpt-3.5-turbo"}
+            onChange={(val) =>
+              setData({
+                ...data,
+                model: val || "gpt-3.5-turbo",
+              })
+            }
+          />
         </Wrapper>
 
         <Wrapper label="Prompts" description="System prompts assigned to the role">
