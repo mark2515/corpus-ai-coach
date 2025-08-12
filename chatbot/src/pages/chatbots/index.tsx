@@ -9,6 +9,8 @@ import Link from "next/link";
 import { ActionIcon, Card, Text, Group, Drawer, Badge } from "@mantine/core";
 import { IconChevronLeft, IconUserPlus, IconPencil } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/slices/usersSlice";
 
 const showNotification = (message: string) => {
   notifications.show({
@@ -24,29 +26,49 @@ const Assistant: NextPage = () => {
   const [assistantList, setAssistantList] = useState<AssistantList>([]);
   const [opened, drawerHandler] = useDisclosure(false);
   const [editAssistant, setEditAssistant] = useState<EditAssistant>();
+  const currentUser = useAppSelector(selectCurrentUser);
 
   useEffect(() => {
-    const list = assistantStore.getList();
-    setAssistantList(list);
-  }, []);
+    const init = async () => {
+      if (currentUser && !currentUser.isGuest) {
+        const list = await assistantStore.syncFromServer(currentUser._id);
+        setAssistantList(list);
+      } else {
+        const list = assistantStore.getList();
+        setAssistantList(list);
+      }
+    };
+    void init();
+  }, [currentUser]);
 
-  const saveAssistant = (data: EditAssistant) => {
+  const saveAssistant = async (data: EditAssistant) => {
     if (data.id) {
-      let newAssistantList = assistantStore.updateAssistant(data.id, data);
+      const newAssistantList = await assistantStore.updateAssistant(
+        data.id,
+        data,
+        currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+      );
       setAssistantList(newAssistantList);
     } else {
       const newAssistant = {
         ...data,
         id: Date.now().toString(),
       };
-      let newAssistantList = assistantStore.addAssistant(newAssistant);
+      const newAssistantList = await assistantStore.addAssistant(
+        newAssistant,
+        currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+      );
       setAssistantList(newAssistantList);
     }
     showNotification("Save Successfully");
     drawerHandler.close();
   };
-  const removeAssistant = (id: string) => {
-    let newAssistantList = assistantStore.removeAssistant(id);
+
+  const removeAssistant = async (id: string) => {
+    const newAssistantList = await assistantStore.removeAssistant(
+      id,
+      currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+    );
     setAssistantList(newAssistantList);
     showNotification("Remove Successfully");
     drawerHandler.close();
