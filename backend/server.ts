@@ -5,6 +5,7 @@ import connectDB from "./config/db";
 import usersRoute from "./routers/usersRouter";
 import wordListsRoute from "./routers/wordListsRouter";
 import messagesRoute from "./routers/messagesRouter";
+import assistantsRoute from "./routers/assistantsRouter";
 import { notFound, errorHandler } from './middleware/errorMiddleware'
 
 const app = express();
@@ -27,6 +28,8 @@ app.use('/api/users', usersRoute);
 app.use('/api/wordLists', wordListsRoute);
 
 app.use('/api/messages', messagesRoute);
+
+app.use('/api/assistants', assistantsRoute);
 
 app.use(notFound)
 app.use(errorHandler)
