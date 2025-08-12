@@ -107,6 +107,24 @@ export const AssistantConfig = ({ assistant, save, remove }: Props) => {
           />
         </Wrapper>
 
+        <Wrapper
+          label="Diversity"
+          variant="filled"
+          description="Lower values only consider high-probability words"
+        >
+          <NumberInput
+            type="number"
+            variant="filled"
+            precision={1}
+            max={1}
+            min={0}
+            step={0.1}
+            value={data.top_p}
+            name="top_p"
+            onChange={(val) => onNumberChange(val, "top_p")}
+          />
+        </Wrapper>
+
         <Wrapper label="Context Window Size" description="How many previous exchanges the model can remember">
           <NumberInput
             type="number"

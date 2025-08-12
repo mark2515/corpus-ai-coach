@@ -28,6 +28,7 @@ export type Assistant = {
   description?: string;
   prompt: string;
   temperature?: number;
+  top_p?: number;
   max_log: number;
   max_tokens: number;
 };

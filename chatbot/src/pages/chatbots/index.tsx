@@ -99,12 +99,18 @@ const Assistant: NextPage = () => {
             </Text>
             <Group className="mt-4 flex items-center">
               <Group>
+                <Badge size="md" color="violet" radius="sm">
+                  MODEL: {item.model}
+                </Badge>
                 <Badge size="md" color="green" radius="sm">
                   TOKEN: {item.max_tokens}
                 </Badge>
                 <Badge size="md" color="blue" radius="sm">
                   TEMP: {item.temperature}
-                </Badge>{" "}
+                </Badge>
+                <Badge size="md" color="blue" radius="sm">
+                  TOP_P: {item.top_p}
+                </Badge>
                 <Badge size="md" color="cyan" radius="sm">
                   LOGS: {item.max_log}
                 </Badge>
