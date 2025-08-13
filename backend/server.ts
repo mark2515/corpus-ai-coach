@@ -6,6 +6,7 @@ import usersRoute from "./routers/usersRouter";
 import wordListsRoute from "./routers/wordListsRouter";
 import messagesRoute from "./routers/messagesRouter";
 import assistantsRoute from "./routers/assistantsRouter";
+import sessionsRoute from "./routers/sessionsRouter";
 import { notFound, errorHandler } from './middleware/errorMiddleware'
 
 const app = express();
@@ -30,6 +31,8 @@ app.use('/api/wordLists', wordListsRoute);
 app.use('/api/messages', messagesRoute);
 
 app.use('/api/assistants', assistantsRoute);
+
+app.use('/api/sessions', sessionsRoute);
 
 app.use(notFound)
 app.use(errorHandler)
