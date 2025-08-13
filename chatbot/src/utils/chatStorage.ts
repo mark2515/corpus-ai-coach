@@ -8,6 +8,7 @@ import type {
 } from "@/types";
 import { getLocal, setLocal } from "./storage";
 import assistantStore from "./assistantStore";
+import { API_BASE } from "./constant";
 
 /* Message */
 export const getMessageStore = () => {
@@ -59,10 +60,29 @@ export const updateSessionStore = (list: SessionList) => {
   setLocal(SESSION_STORE, list);
 };
 
-export const addSession = (session: Session): SessionList => {
+export const addSession = async (session: Session, userId?: string): Promise<SessionList> => {
   const list = getSessionStore();
   list.push(session);
   updateSessionStore(list);
+  if (userId) {
+    try {
+      const res = await fetch(`${API_BASE}/sessions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user: userId,
+          name: session.name,
+          assistant: session.assistant,
+        }),
+      });
+      const created = await res.json();
+      const newList = getSessionStore().map((s) => (s.id === session.id ? { ...s, id: created._id } : s));
+      updateSessionStore(newList);
+      return newList;
+    } catch (e) {
+      console.error("Failed to save session to DB:", e);
+    }
+  }
   return list;
 };
 
@@ -86,7 +106,8 @@ export const getSession = (id: string): SessionInfo | null => {
 
 export const updateSession = (
   id: string,
-  data: Partial<Omit<Session, "id">>,
+  data: Partial<Omit<Session, "id">>, 
+  userId?: string,
 ): SessionList => {
   const list = getSessionStore();
   const index = list.findIndex((session) => session.id === id);
@@ -97,12 +118,44 @@ export const updateSession = (
     };
     updateSessionStore(list);
   }
+  if (userId) {
+    fetch(`${API_BASE}/sessions/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }).catch((e) => console.error("Failed to update session in DB:", e));
+  }
   return list;
 };
 
-export const removeSession = (id: string) => {
+export const removeSession = (id: string, userId?: string) => {
   const list = getSessionStore();
   const newList = list.filter((session) => session.id !== id);
   updateSessionStore(newList);
+  if (userId) {
+    fetch(`${API_BASE}/sessions/${id}`, { method: "DELETE" }).catch((e) =>
+      console.error("Failed to delete session in DB:", e),
+    );
+  }
   return newList;
+};
+
+export const syncSessionsFromServer = async (userId: string) => {
+  try {
+    const res = await fetch(`${API_BASE}/sessions?user=${encodeURIComponent(userId)}`);
+    const serverList = await res.json();
+    const normalized: SessionList = serverList.map((item: any) => ({
+      id: item._id,
+      name: item.name,
+      assistant: item.assistant,
+    }));
+    if (normalized.length > 0) {
+      updateSessionStore(normalized);
+      return normalized;
+    }
+    return getSessionStore();
+  } catch (e) {
+    console.error("Failed to sync sessions:", e);
+    return getSessionStore();
+  }
 };

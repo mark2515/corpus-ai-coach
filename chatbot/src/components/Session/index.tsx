@@ -15,6 +15,8 @@ import {
   Burger,
 } from "@mantine/core";
 import clsx from "clsx";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/slices/usersSlice";
 
 type Props = {
   sessionId: string;
@@ -49,11 +51,21 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
   const { colorScheme } = useMantineColorScheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useMantineTheme();
+  const currentUser = useAppSelector(selectCurrentUser);
 
   useEffect(() => {
-    const list = chatStorage.getSessionStore();
-    setSessionList(list);
-  }, []);
+    const init = async () => {
+      if (currentUser && !currentUser.isGuest) {
+        await assistantStore.syncFromServer(currentUser._id);
+        const list = await chatStorage.syncSessionsFromServer(currentUser._id);
+        setSessionList(list);
+      } else {
+        const list = chatStorage.getSessionStore();
+        setSessionList(list);
+      }
+    };
+    void init();
+  }, [currentUser]);
 
   const createSession = () => {
     const assistantList = assistantStore.getList();
@@ -63,12 +75,30 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
       id: Date.now().toString(),
     };
     onChange(newSession.id);
-    let list = chatStorage.addSession(newSession);
-    setSessionList(list);
+    const save = async () => {
+      await chatStorage.addSession(
+        newSession,
+        currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+      );
+
+      if (currentUser && !currentUser.isGuest) {
+        const remoteList = await chatStorage.syncSessionsFromServer(currentUser._id);
+        setSessionList(remoteList);
+        if (remoteList.length > 0) {
+          onChange(remoteList[0].id);
+        }
+      } else {
+        setSessionList(chatStorage.getSessionStore());
+      }
+    };
+    void save();
   };
 
   const removeSession = (id: string) => {
-    let list = chatStorage.removeSession(id);
+    let list = chatStorage.removeSession(
+      id,
+      currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+    );
     if (sessionId === id && list.length > 0) {
       onChange(list[0].id);
     }
@@ -76,7 +106,11 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
   };
 
   const updateSession = (name: string) => {
-    let newSessionList = chatStorage.updateSession(sessionId, { name });
+    let newSessionList = chatStorage.updateSession(
+      sessionId,
+      { name },
+      currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+    );
     setSessionList(newSessionList);
   };
 
