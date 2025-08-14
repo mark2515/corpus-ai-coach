@@ -14,7 +14,8 @@ import {
 import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
 import { ThemeSwitch } from "../ThemeSwitch";
-import { USERMAP } from "@/utils/constant";
+import { USERMAP, MESSAGE_STORE, SESSION_STORE, ASSISTANT_STORE } from "@/utils/constant";
+import { removeLocal } from "@/utils/storage";
 import { AssistantSelect } from "../AssistantSelect";
 import {
   IconSend,
@@ -205,7 +206,11 @@ export const Message = ({ sessionId }: Props) => {
     dispatch(clearUser());
     Cookies.remove("guestUser");
     Cookies.remove("googleUser");
+    removeLocal(MESSAGE_STORE); 
+    removeLocal(SESSION_STORE);
+    removeLocal(ASSISTANT_STORE);
     setOpenedLogoutPopover(false);
+    window.location.reload();
   };
 
   const handleGuestLogin = async () => {
