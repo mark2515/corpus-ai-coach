@@ -3,17 +3,29 @@ import * as chatStorage from "@/utils/chatStorage";
 import { Message } from "@/components/Message";
 import { Session } from "../Session";
 import { MediaQuery } from "@mantine/core";
+import assistantStore from "@/utils/assistantStore";
+import { useAppSelector } from "@/store";
+import { selectCurrentUser } from "@/slices/usersSlice";
 
 export const Chat = () => {
   const [sessionId, setSessionId] = useState<string>("");
+  const currentUser = useAppSelector(selectCurrentUser);
+
   useEffect(() => {
-    const init = () => {
-      const list = chatStorage.getSessionStore();
-      const id = list[0].id;
-      setSessionId(id);
+    const init = async () => {
+      let list;
+      if (currentUser && !currentUser.isGuest) {
+        await assistantStore.syncAssistantsFromServer(currentUser._id);
+        list = await chatStorage.syncSessionsFromServer(currentUser._id);
+      } else {
+        list = chatStorage.getSessionStore();
+      }
+      if (list && list.length > 0) {
+        setSessionId(list[0].id);
+      }
     };
-    init();
-  }, []);
+    void init();
+  }, [currentUser]);
 
   return (
     <div className="h-screen flex w-screen">
