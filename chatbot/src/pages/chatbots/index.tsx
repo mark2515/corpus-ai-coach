@@ -31,7 +31,7 @@ const Assistant: NextPage = () => {
   useEffect(() => {
     const init = async () => {
       if (currentUser && !currentUser.isGuest) {
-        const list = await assistantStore.syncFromServer(currentUser._id);
+        const list = await assistantStore.syncAssistantsFromServer(currentUser._id);
         setAssistantList(list);
       } else {
         const list = assistantStore.getList();

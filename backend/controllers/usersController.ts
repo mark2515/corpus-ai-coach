@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/usersModel';
+import Assistants from '../models/assistantsModel';
 
 //@desc     get all users
 //@route    GET /api/users
@@ -32,6 +33,20 @@ const addGoogleUser = asyncHandler(async (req, res) => {
         { name, picture },
         { new: true, upsert: true }
     );
+
+    const hasAssistant = await Assistants.exists({ user: user._id });
+    if (!hasAssistant) {
+      await Assistants.create({
+        user: user._id,
+        name: "Chatbot No.1",
+        model: "gpt-3.5-turbo",
+        prompt: "You are a language-learn chatbot. Your task is to communicate with users using appropriate and natural English.",
+        temperature: 0.7,
+        top_p: 0.9,
+        max_log: 4,
+        max_tokens: 800,
+      });
+    }
 
     const userWithGuestFlag = {
         ...user.toObject(),

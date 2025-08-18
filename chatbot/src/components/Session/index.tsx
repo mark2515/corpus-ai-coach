@@ -56,7 +56,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
   useEffect(() => {
     const init = async () => {
       if (currentUser && !currentUser.isGuest) {
-        await assistantStore.syncFromServer(currentUser._id);
+        await assistantStore.syncAssistantsFromServer(currentUser._id);
         const list = await chatStorage.syncSessionsFromServer(currentUser._id);
         setSessionList(list);
       } else {

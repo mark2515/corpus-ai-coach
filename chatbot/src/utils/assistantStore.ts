@@ -1,6 +1,6 @@
 import { getLocal, setLocal } from "./storage";
 import { ASSISTANT_STORE, ASSISTANT_INIT, API_BASE } from "./constant";
-import type { AssistantList, Assistant } from "@/types";
+import type { Assistant, AssistantList } from "@/types";
 
 const getList = (): AssistantList => {
   let list = getLocal(ASSISTANT_STORE) as AssistantList;
@@ -104,7 +104,7 @@ const getAssistant = (id: string): Assistant | null => {
   return list.find((item) => item.id === id) || null;
 };
 
-const syncFromServer = async (userId: string) => {
+const syncAssistantsFromServer = async (userId: string) => {
   try {
     const res = await fetch(`${API_BASE}/assistants?user=${encodeURIComponent(userId)}`);
     const serverList = await res.json();
@@ -137,5 +137,5 @@ export default {
   updateAssistant,
   removeAssistant,
   getAssistant,
-  syncFromServer,
+  syncAssistantsFromServer,
 };

@@ -7,7 +7,7 @@ import Assistants from '../models/assistantsModel';
 const getAssistants = asyncHandler(async (req, res) => {
   const { user } = req.query as { user?: string };
   const query = user ? { user } : {};
-  const list = await Assistants.find(query).sort({ createdAt: -1 });
+  const list = await Assistants.find(query).sort({ createdAt: 1 });
   res.json(list);
 });
 
