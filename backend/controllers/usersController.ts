@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/usersModel';
 import Assistants from '../models/assistantsModel';
+import Sessions from '../models/sessionsModel';
 
 //@desc     get all users
 //@route    GET /api/users
@@ -34,9 +35,9 @@ const addGoogleUser = asyncHandler(async (req, res) => {
         { new: true, upsert: true }
     );
 
-    const hasAssistant = await Assistants.exists({ user: user._id });
-    if (!hasAssistant) {
-      await Assistants.create({
+    let defaultAssistant = await Assistants.findOne({ user: user._id }).sort({ createdAt: 1 });
+    if (!defaultAssistant) {
+      defaultAssistant = await Assistants.create({
         user: user._id,
         name: "Chatbot No.1",
         model: "gpt-3.5-turbo",
@@ -46,6 +47,15 @@ const addGoogleUser = asyncHandler(async (req, res) => {
         max_log: 4,
         max_tokens: 800,
       });
+    }
+
+    const hasSession = await Sessions.exists({ user: user._id });
+    if (!hasSession) {
+        await Sessions.create({
+            user: user._id,
+            name: "Session-1",
+            assistant: defaultAssistant._id,
+        });
     }
 
     const userWithGuestFlag = {
