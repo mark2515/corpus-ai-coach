@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
+import assistantStore from "@/utils/assistantStore";
 import { ThemeSwitch } from "../ThemeSwitch";
 import { USERMAP, MESSAGE_STORE, SESSION_STORE, ASSISTANT_STORE } from "@/utils/constant";
 import { removeLocal } from "@/utils/storage";
@@ -89,14 +90,20 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   useEffect(() => {
-    const session = chatStorage.getSession(sessionId);
-    setAssistant(session?.assistant);
-    const msg = chatStorage.getMessage(sessionId);
-    setMessage(msg);
-    if (loading) {
-      chatService.cancel();
-    }
-  }, [sessionId, mode]);
+    const init = async () => {
+      if (currentUser && !currentUser.isGuest) {
+        await assistantStore.syncAssistantsFromServer(currentUser._id);
+      }
+      const session = chatStorage.getSession(sessionId);
+      setAssistant(session?.assistant);
+      const msg = chatStorage.getMessage(sessionId);
+      setMessage(msg);
+      if (loading) {
+        chatService.cancel();
+      }
+    };
+    void init();
+  }, [sessionId, mode, currentUser]);
 
   useEffect(() => {
     const storedGuestUser = Cookies.get("guestUser");
