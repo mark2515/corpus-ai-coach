@@ -122,9 +122,13 @@ export const Message = ({ sessionId }: Props) => {
 
   const onAssistantChange = (assistant: Assistant) => {
     setAssistant(assistant);
-    chatStorage.updateSession(sessionId, {
-      assistant: assistant.id,
-    });
+    chatStorage.updateSession(
+      sessionId, 
+      {
+        assistant: assistant.id,
+      },
+      currentUser && !currentUser.isGuest ? currentUser._id : undefined
+    );
   };
 
   const onClear = () => {
