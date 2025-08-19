@@ -48,6 +48,15 @@ const guestUser: User = {
   isGuest: true,
 };
 
+interface GoogleLoginResponse {
+  data: {
+    _id: string;
+    name: string;
+    email: string;
+    picture: string;
+  };
+}
+
 export const Message = ({ sessionId }: Props) => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,6 +67,7 @@ export const Message = ({ sessionId }: Props) => {
   const [mode, setMode] = useState<"text" | "voice">("text");
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
+  const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const currentUser = useAppSelector(selectCurrentUser);
   const messageRef = useRef<MessageList>([]);
@@ -251,6 +261,62 @@ export const Message = ({ sessionId }: Props) => {
     }
   };
 
+  const handleGoogleLogin = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) {
+      console.error("No credential received from Google");
+      return;
+    }
+
+    setGoogleLoginLoading(true);
+    
+    try {
+      const decoded = jwtDecode<User>(credentialResponse.credential);
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout')), 5000);
+      });
+
+      const loginPromise = axios.post<GoogleLoginResponse["data"]>("http://localhost:5000/api/users/google-login", {
+        name: decoded.name,
+        email: decoded.email,
+        picture: decoded.picture,
+      });
+
+      const response = await Promise.race([loginPromise, timeoutPromise]) as Awaited<typeof loginPromise>;
+
+      const userData = response.data;
+      dispatch(saveGoogleUser({
+        _id: userData._id,
+        name: userData.name,
+        email: userData.email,
+        picture: userData.picture,
+      }));
+      
+      Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
+      console.log("User saved successfully");
+      setOpenedModal(false);
+      
+    } catch (err) {
+      console.error("Failed to save user", err);
+      const isError = (error: unknown): error is Error => {
+        return error instanceof Error;
+      };
+      
+      if (isError(err)) {
+        if (err.message === 'Request timeout') {
+          console.error("Login request timed out. Please try again.");
+        } else {
+          console.error("Login failed. Please try again.");
+        }
+      } else {
+        console.error("An unknown error occurred during login.");
+      }
+      setOpenedModal(false);
+    } finally {
+      setGoogleLoginLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen w-full">
       <div
@@ -292,44 +358,32 @@ export const Message = ({ sessionId }: Props) => {
           </div>
         </Modal>
 
-        <Modal
+         <Modal
           opened={openedModal}
           onClose={() => setOpenedModal(false)}
           title="Sign In"
           centered
+          closeOnClickOutside={!googleLoginLoading}
+          closeOnEscape={!googleLoginLoading}
         >
           <p>Choose a method to continue.</p>
-          <GoogleLogin 
-            onSuccess={async (credentialResponse) => {
-              if (credentialResponse.credential) {
-                const decoded = jwtDecode<User>(credentialResponse.credential);
-
-                try {
-                  const response = await axios.post("http://localhost:5000/api/users/google-login", {
-                    name: decoded.name,
-                    email: decoded.email,
-                    picture: decoded.picture,
-                  });
-
-                  const userData = response.data;
-                  dispatch(saveGoogleUser({
-                    _id: userData._id,
-                    name: userData.name,
-                    email: userData.email,
-                    picture: userData.picture,
-                  }));
-                  Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
-                  setOpenedModal(false);
-                  console.log("User saved");
-                } catch (err) {
-                  console.error("Failed to save user", err);
-                }
-              }
-            }}
-            onError={() => console.log("Login Failed")}
-            auto_select={true}
-          />
+          {googleLoginLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader size="md" />
+              <span className="ml-2">Signing in with Google...</span>
+            </div>
+          ) : (
+            <GoogleLogin 
+              onSuccess={handleGoogleLogin}
+              onError={() => {
+                console.log("Google Login Failed");
+                setOpenedModal(false);
+              }}
+              auto_select={true}
+            />
+          )}
         </Modal>
+        
         <Popover width={100} position="bottom" withArrow shadow="sm">
           <Link href="/test" passHref legacyBehavior>
             <Button
