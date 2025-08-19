@@ -19,6 +19,7 @@ export const Chat = () => {
         list = await chatStorage.syncSessionsFromServer(currentUser._id);
       } else {
         list = chatStorage.getSessionStore();
+        list = [...list].reverse();
       }
       if (list && list.length > 0) {
         setSessionId(list[0].id);
