@@ -52,6 +52,7 @@ export const Message = ({ sessionId }: Props) => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [openedModal, setOpenedModal] = useState(false);
+  const [openedLoginRequiredModal, setOpenedLoginRequiredModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [mode, setMode] = useState<"text" | "voice">("text");
@@ -194,6 +195,10 @@ export const Message = ({ sessionId }: Props) => {
       return chatService.cancel();
     }
     if (!prompt.trim()) return;
+    if (!currentUser) {
+      setOpenedLoginRequiredModal(true);
+      return;
+    }
     let list: MessageList = [
       ...message,
       {
@@ -258,6 +263,35 @@ export const Message = ({ sessionId }: Props) => {
           "h-[6rem]",
         ])}
       >
+        <Modal
+          opened={openedLoginRequiredModal}
+          onClose={() => setOpenedLoginRequiredModal(false)}
+          title={<strong>Login Required</strong>}
+          centered
+        >
+          <p>You must be logged in to send a message. Please choose a login option below:</p>
+          <div className="flex gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                handleGuestLogin();
+                setOpenedLoginRequiredModal(false);
+              }}
+            >
+              Continue as Guest
+            </Button>
+            <Button
+              variant="filled" style={{ color: 'white', backgroundColor: 'teal' }} 
+              onClick={() => {
+                setOpenedLoginRequiredModal(false);
+                setOpenedModal(true);
+              }}
+            >
+              Sign in with Google
+            </Button>
+          </div>
+        </Modal>
+
         <Modal
           opened={openedModal}
           onClose={() => setOpenedModal(false)}
