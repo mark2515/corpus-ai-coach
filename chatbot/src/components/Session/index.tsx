@@ -61,7 +61,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
         setSessionList(list);
       } else {
         const list = chatStorage.getSessionStore();
-        setSessionList([...list].reverse());
+        setSessionList(list);
       }
     };
     void init();
@@ -89,7 +89,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
         }
       } else {
         const list = chatStorage.getSessionStore();
-        setSessionList([...list].reverse());
+        setSessionList(list);
       }
     };
     void save();

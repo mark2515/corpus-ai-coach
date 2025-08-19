@@ -62,7 +62,7 @@ export const updateSessionStore = (list: SessionList) => {
 
 export const addSession = async (session: Session, userId?: string): Promise<SessionList> => {
   const list = getSessionStore();
-  list.push(session);
+  list.unshift(session);
   updateSessionStore(list);
   if (userId) {
     try {
