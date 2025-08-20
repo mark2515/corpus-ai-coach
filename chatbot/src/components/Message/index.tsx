@@ -104,11 +104,16 @@ export const Message = ({ sessionId }: Props) => {
     const init = async () => {
       if (currentUser && !currentUser.isGuest) {
         await assistantStore.syncAssistantsFromServer(currentUser._id);
+        const syncedMessages = await chatStorage.syncMessagesFromServer(currentUser._id, sessionId);
+        setMessage(syncedMessages);
+      } else {
+        const msg = chatStorage.getMessage(sessionId);
+        setMessage(msg);
       }
+      
       const session = chatStorage.getSession(sessionId);
       setAssistant(session?.assistant);
-      const msg = chatStorage.getMessage(sessionId);
-      setMessage(msg);
+      
       if (loading) {
         chatService.cancel();
       }
@@ -192,6 +197,7 @@ export const Message = ({ sessionId }: Props) => {
     try {
       await axios.post("http://localhost:5000/api/messages", {
         user: currentUser?._id,
+        session: sessionId,
         role,
         content,
       });
@@ -273,7 +279,7 @@ export const Message = ({ sessionId }: Props) => {
       const decoded = jwtDecode<User>(credentialResponse.credential);
 
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 5000);
+        setTimeout(() => reject(new Error('Request timeout')), 10000);
       });
 
       const loginPromise = axios.post<GoogleLoginResponse["data"]>("http://localhost:5000/api/users/google-login", {

@@ -1,8 +1,13 @@
 export type Role = "user" | "assistant" | "system";
 
 export type Message = {
+  _id?: string;
   role: Role;
   content: string;
+  user?: string;
+  session?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type MessageList = Message[];

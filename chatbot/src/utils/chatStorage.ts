@@ -39,6 +39,32 @@ export const clearMessage = (id: string) => {
   setLocal(MESSAGE_STORE, logs);
 };
 
+export const syncMessagesFromServer = async (userId: string, sessionId: string): Promise<MessageList> => {
+  try {
+    const res = await fetch(`${API_BASE}/messages?userId=${encodeURIComponent(userId)}&sessionId=${encodeURIComponent(sessionId)}`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    const serverMessages = await res.json();
+    
+    const normalizedMessages: MessageList = serverMessages.map((msg: any) => ({
+      _id: msg._id,
+      role: msg.role,
+      content: msg.content,
+      user: msg.user,
+      session: msg.session,
+      createdAt: msg.createdAt,
+      updatedAt: msg.updatedAt,
+    }));
+    
+    updateMessage(sessionId, normalizedMessages);
+    return normalizedMessages;
+  } catch (e) {
+    console.error("Failed to sync messages from server:", e);
+    return getMessage(sessionId);
+  }
+};
+
 /* Session */
 export const getSessionStore = (): SessionList => {
   let list: SessionList = getLocal(SESSION_STORE) as SessionList;
