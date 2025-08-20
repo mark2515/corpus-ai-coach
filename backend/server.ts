@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from 'dotenv'
 import connectDB from "./config/db";
 import usersRoute from "./routers/usersRouter";
-import wordListsRoute from "./routers/wordListsRouter";
 import messagesRoute from "./routers/messagesRouter";
 import assistantsRoute from "./routers/assistantsRouter";
 import sessionsRoute from "./routers/sessionsRouter";
@@ -25,8 +24,6 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/users', usersRoute);
-
-app.use('/api/wordLists', wordListsRoute);
 
 app.use('/api/messages', messagesRoute);
 

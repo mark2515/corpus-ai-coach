@@ -391,17 +391,6 @@ export const Message = ({ sessionId }: Props) => {
         </Modal>
         
         <Popover width={100} position="bottom" withArrow shadow="sm">
-          <Link href="/test" passHref legacyBehavior>
-            <Button
-              size="xs"
-              variant="light"
-              color="blue"
-              className="ml-4"
-              style={{ height: "2rem" }}
-            >
-              Go to /test
-            </Button>
-          </Link>
           <Popover.Target>
             <Button
               size="sm"

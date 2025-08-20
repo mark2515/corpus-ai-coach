@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { WordListsSlice } from './slices/wordListsSlice';
 import { UsersSlice } from './slices/usersSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 const store = configureStore({
   reducer: {
-    wordList: WordListsSlice.reducer,
     user: UsersSlice.reducer,
   },
 });
