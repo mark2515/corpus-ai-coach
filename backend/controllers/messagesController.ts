@@ -76,4 +76,18 @@ const deleteMessage = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Message deleted successfully' });
 });
 
-export { getMessages, getMessagesBySession, addMessage, deleteMessage };
+// @desc    delete all messages by session
+// @route   DELETE /api/messages/session/:sessionId
+// @access  public
+const deleteMessagesBySession = asyncHandler(async (req, res) => {
+  const { sessionId } = req.params;
+  
+  const result = await Messages.deleteMany({ session: sessionId });
+  
+  res.status(200).json({ 
+    message: `Successfully deleted ${result.deletedCount} messages from session`,
+    deletedCount: result.deletedCount 
+  });
+});
+
+export { getMessages, getMessagesBySession, addMessage, deleteMessage, deleteMessagesBySession };

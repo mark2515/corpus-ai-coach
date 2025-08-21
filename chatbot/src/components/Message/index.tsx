@@ -147,8 +147,21 @@ export const Message = ({ sessionId }: Props) => {
     );
   };
 
-  const onClear = () => {
+  const onClear = async () => {
     updateMessage([]);
+    
+    if (currentUser && !currentUser.isGuest) {
+      try {
+        const success = await chatStorage.clearMessagesFromServer(sessionId);
+        if (success) {
+          console.log("Successfully cleared messages from database");
+        } else {
+          console.error("Failed to clear messages from database");
+        }
+      } catch (error) {
+        console.error("Error clearing messages from database:", error);
+      }
+    }
   };
 
   const onKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {

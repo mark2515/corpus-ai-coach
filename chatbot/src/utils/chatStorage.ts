@@ -39,6 +39,22 @@ export const clearMessage = (id: string) => {
   setLocal(MESSAGE_STORE, logs);
 };
 
+export const clearMessagesFromServer = async (sessionId: string): Promise<boolean> => {
+  try {
+    const res = await fetch(`${API_BASE}/messages/session/${sessionId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    await res.json();
+    return true;
+  } catch (e) {
+    console.error("Failed to clear messages from server:", e);
+    return false;
+  }
+};
+
 export const syncMessagesFromServer = async (userId: string, sessionId: string): Promise<MessageList> => {
   try {
     const res = await fetch(`${API_BASE}/messages?userId=${encodeURIComponent(userId)}&sessionId=${encodeURIComponent(sessionId)}`);
