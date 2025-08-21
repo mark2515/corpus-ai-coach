@@ -1,1 +1,1 @@
-# corpora-ai-coach
+# corpus-ai-coach
