@@ -15,8 +15,8 @@ import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
 import assistantStore from "@/utils/assistantStore";
 import { ThemeSwitch } from "../ThemeSwitch";
-import { USERMAP, MESSAGE_STORE, SESSION_STORE, ASSISTANT_STORE } from "@/utils/constant";
-import { removeLocal } from "@/utils/storage";
+import { USERMAP, MESSAGE_STORE, SESSION_STORE, ASSISTANT_STORE, CURRENT_SESSION_COOKIE } from "@/utils/constant";
+import { removeLocal, removeCookie } from "@/utils/storage";
 import { AssistantSelect } from "../AssistantSelect";
 import {
   IconSend,
@@ -241,6 +241,7 @@ export const Message = ({ sessionId }: Props) => {
     removeLocal(MESSAGE_STORE); 
     removeLocal(SESSION_STORE);
     removeLocal(ASSISTANT_STORE);
+    removeCookie(CURRENT_SESSION_COOKIE);
     setOpenedLogoutPopover(false);
     window.location.reload();
   };

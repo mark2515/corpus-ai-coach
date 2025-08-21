@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as chatStorage from "@/utils/chatStorage";
+import { getCookie } from "@/utils/storage";
+import { CURRENT_SESSION_COOKIE } from "@/utils/constant";
 import { Message } from "@/components/Message";
 import { Session } from "../Session";
 import { MediaQuery } from "@mantine/core";
@@ -20,8 +22,16 @@ export const Chat = () => {
       } else {
         list = chatStorage.getSessionStore();
       }
+      
       if (list && list.length > 0) {
-        setSessionId(list[0].id);
+        const savedSessionId = getCookie(CURRENT_SESSION_COOKIE);
+        const sessionExists = savedSessionId && list.some(session => session.id === savedSessionId);
+        
+        if (sessionExists) {
+          setSessionId(savedSessionId);
+        } else {
+          setSessionId(list[0].id);
+        }
       }
     };
     void init();

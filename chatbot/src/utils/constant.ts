@@ -1,6 +1,7 @@
 export const MESSAGE_STORE = "ai_assistant_message";
 export const SESSION_STORE = "ai_assistant_session";
 export const ASSISTANT_STORE = "ai_assistant_assistant";
+export const CURRENT_SESSION_COOKIE = "current_session";
 
 export const MAX_TOKEN = 800;
 export const TEAMPERATURE = 0.7;

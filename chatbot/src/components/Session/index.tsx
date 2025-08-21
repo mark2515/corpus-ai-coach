@@ -1,5 +1,7 @@
 import type { Session as ISession, SessionList } from "@/types";
 import * as chatStorage from "@/utils/chatStorage";
+import { setCookie } from "@/utils/storage";
+import { CURRENT_SESSION_COOKIE } from "@/utils/constant";
 import React, { useEffect, useState } from "react";
 import { IconTrash, IconMessagePlus } from "@tabler/icons-react";
 import { EditableText } from "../EditableText";
@@ -67,6 +69,11 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
     void init();
   }, [currentUser]);
 
+  const handleSessionChange = (newSessionId: string) => {
+    setCookie(CURRENT_SESSION_COOKIE, newSessionId);
+    onChange(newSessionId);
+  };
+
   const createSession = () => {
     const assistantList = assistantStore.getList();
     const newSession: ISession = {
@@ -74,7 +81,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
       assistant: assistantList[0].id,
       id: Date.now().toString(),
     };
-    onChange(newSession.id);
+    handleSessionChange(newSession.id);
     const save = async () => {
       await chatStorage.addSession(
         newSession,
@@ -85,7 +92,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
         const remoteList = await chatStorage.syncSessionsFromServer(currentUser._id);
         setSessionList(remoteList);
         if (remoteList.length > 0) {
-          onChange(remoteList[0].id);
+          handleSessionChange(remoteList[0].id);
         }
       } else {
         const list = chatStorage.getSessionStore();
@@ -101,7 +108,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
       currentUser && !currentUser.isGuest ? currentUser._id : undefined,
     );
     if (sessionId === id && list.length > 0) {
-      onChange(list[0].id);
+      handleSessionChange(list[0].id);
     }
     setSessionList(list);
   };
@@ -178,7 +185,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
               <div
                 key={id}
                 className={generateItemClasses(id, sessionId, colorScheme)}
-                onClick={() => onChange(id)}
+                onClick={() => handleSessionChange(id)}
               >
                 <EditableText
                   text={name}
@@ -223,7 +230,7 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
               <div
                 key={id}
                 className={generateItemClasses(id, sessionId, colorScheme)}
-                onClick={() => onChange(id)}
+                onClick={() => handleSessionChange(id)}
               >
                 <EditableText
                   text={name}
