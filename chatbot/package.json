@@ -31,7 +31,6 @@
     "highlight.js": "^11.8.0",
     "js-cookie": "^3.0.5",
     "marked": "^5.0.4",
-    "mic-recorder-to-mp3": "^2.2.2",
     "next": "13.3.4",
     "openai": "^4.17.5",
     "path": "^0.12.7",

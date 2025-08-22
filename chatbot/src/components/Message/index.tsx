@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, KeyboardEvent } from "react";
 import chatService from "@/utils/chatService";
 import { Markdown } from "../Markdown";
-import { Voice } from "../Voice";
 import {
   ActionIcon,
   Loader,
@@ -23,8 +22,6 @@ import {
   IconSendOff,
   IconEraser,
   IconDotsVertical,
-  IconHeadphones,
-  IconHeadphonesOff,
 } from "@tabler/icons-react";
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
@@ -64,7 +61,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginRequiredModal, setOpenedLoginRequiredModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
-  const [mode, setMode] = useState<"text" | "voice">("text");
+
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
@@ -119,7 +116,7 @@ export const Message = ({ sessionId }: Props) => {
       }
     };
     void init();
-  }, [sessionId, mode, currentUser]);
+  }, [sessionId, currentUser]);
 
   useEffect(() => {
     const storedGuestUser = Cookies.get("guestUser");
@@ -422,16 +419,6 @@ export const Message = ({ sessionId }: Props) => {
           </Popover.Dropdown>
         </Popover>
         <div className="flex items-center mr-auto">
-          <ActionIcon
-            size="sm"
-            onClick={() => setMode(mode === "text" ? "voice" : "text")}
-          >
-            {mode === "text" ? (
-              <IconHeadphones color="green" size="1rem"></IconHeadphones>
-            ) : (
-              <IconHeadphonesOff color="gray" size="1rem"></IconHeadphonesOff>
-            )}
-          </ActionIcon>
           <AssistantSelect
             value={assistant?.id!}
             onChange={onAssistantChange}
@@ -525,9 +512,7 @@ export const Message = ({ sessionId }: Props) => {
             </div>
           </>)}
           </div>
-      {mode === "text" ? (
-        <>
-          <div
+        <div
             className={clsx([
               "flex-col",
               "h-[calc(100vh-10rem)]",
@@ -618,12 +603,7 @@ export const Message = ({ sessionId }: Props) => {
               {loading ? <IconSendOff /> : <IconSend />}
             </ActionIcon>
           </div>
-        </>
-      ) : (
-        <div className="h-[calc(100vh-6rem)] w-full">
-          <Voice sessionId={sessionId} assistant={assistant!}></Voice>
-        </div>
-      )}
+
     </div>
   );
 };
