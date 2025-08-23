@@ -21,7 +21,7 @@ export const ASSISTANT_INIT = [
 
 export const OPENAI_END_POINT = "https://api.openai.com";
 
-export const API_BASE = "http://localhost:5000/api";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
 
 export const USERMAP = {
   user: "👨‍💻‍",

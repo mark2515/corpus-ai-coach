@@ -9,6 +9,7 @@ const nextConfig = {
   env: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     END_POINT: process.env.END_POINT,
+    NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
   },
 }
 

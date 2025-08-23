@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/store";
 import Cookies from 'js-cookie';
+import { API_BASE } from "@/utils/constant";
 
 export interface User {
   _id: string,
@@ -19,7 +20,7 @@ const initialState: UserState = {
 }
 
 export const fetchUsers = createAsyncThunk("users/fetch", async () => {
-  const response = await fetch("http://localhost:5000/api/users", {
+  const response = await fetch(`${API_BASE}/users`, {
     method: "GET"
   });
   const data = await response.json();
@@ -34,7 +35,7 @@ interface UserPayload {
 }
 
 export const saveGuestUser = createAsyncThunk("guestUser/save", async ({ _id, name, email, picture }: UserPayload) => {
-  const response = await fetch("http://localhost:5000/api/users/guest-login", {
+  const response = await fetch(`${API_BASE}/users/guest-login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -51,7 +52,7 @@ export const saveGuestUser = createAsyncThunk("guestUser/save", async ({ _id, na
 })
 
 export const saveGoogleUser = createAsyncThunk("googleUser/save", async ({ _id, name, email, picture }: UserPayload) => {
-  const response = await fetch("http://localhost:5000/api/users/google-login", {
+  const response = await fetch(`${API_BASE}/users/google-login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

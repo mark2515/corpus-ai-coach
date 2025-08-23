@@ -32,6 +32,7 @@ import Cookies from "js-cookie";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { saveGuestUser, saveGoogleUser, clearUser, selectCurrentUser } from "@/slices/usersSlice";
 import { User } from "../../types/index";
+import { API_BASE } from "@/utils/constant";
 
 type Props = {
   sessionId: string;
@@ -205,7 +206,7 @@ export const Message = ({ sessionId }: Props) => {
   ) => {
     if ( !currentUser || currentUser?.isGuest) return;
     try {
-      await axios.post("http://localhost:5000/api/messages", {
+      await axios.post(`${API_BASE}/messages`, {
         user: currentUser?._id,
         session: sessionId,
         role,
@@ -258,7 +259,7 @@ export const Message = ({ sessionId }: Props) => {
 
   const handleGuestLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/users/guest-login", {
+      const response = await axios.post(`${API_BASE}/users/guest-login`, {
         name: guestUser.name,
         email: guestUser.email,
         picture: guestUser.picture,
@@ -293,7 +294,7 @@ export const Message = ({ sessionId }: Props) => {
         setTimeout(() => reject(new Error('Request timeout')), 10000);
       });
 
-      const loginPromise = axios.post<GoogleLoginResponse["data"]>("http://localhost:5000/api/users/google-login", {
+      const loginPromise = axios.post<GoogleLoginResponse["data"]>(`${API_BASE}/users/google-login`, {
         name: decoded.name,
         email: decoded.email,
         picture: decoded.picture,
