@@ -18,7 +18,10 @@
     "client": "npm run dev --prefix chatbot",
     "install:all": "cd chatbot && npm install && cd .. && npm install",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "data:destroy": "ts-node backend/seeder -d"
+    "data:destroy": "ts-node backend/seeder -d",
+    "build": "tsc",
+    "start": "node dist/backend/server.js",
+    "heroku-postbuild": "npm run build"
   },
   "author": "Mark",
   "license": "ISC",
