@@ -30,6 +30,7 @@
     "eventsource-parser": "^1.0.0",
     "highlight.js": "^11.8.0",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "marked": "^5.0.4",
     "next": "13.3.4",
     "openai": "^4.17.5",
