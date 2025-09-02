@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Sessions from '../models/sessionsModel';
+import Messages from '../models/messagesModel';
 
 // @desc    get sessions (optionally by user)
 // @route   GET /api/sessions?user=:userId
@@ -43,6 +44,7 @@ const updateSession = asyncHandler(async (req, res) => {
 // @access  public
 const deleteSession = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  await Messages.deleteMany({ session: id });
   const deleted = await Sessions.findByIdAndDelete(id);
   if (!deleted) {
     res.status(404);
