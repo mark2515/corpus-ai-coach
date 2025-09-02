@@ -6,7 +6,7 @@ export default function Home() {
     <>
       <Head>
         <title>Corpus AI Coach</title>
-        <meta name="description" content="Corpus AI Coach - Your intelligent conversation partner" />
+        <meta name="description" content="Master spoken English with AI role-play conversations. Learn high-frequency vocabulary curated from the BNC and COCA corpora. Build fluency & confidence fast!" />
       </Head>
       <main>
         <Chat></Chat>

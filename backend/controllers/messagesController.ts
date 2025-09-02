@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Messages from '../models/messagesModel';
+import mongoose from 'mongoose';
 
 //@desc     get all messages from the login user
 //@route    GET /api/messages
@@ -10,19 +11,35 @@ const getMessages = asyncHandler(async (req, res) => {
   let filter: any = {};
   
   if (userId) {
-    filter.user = userId;
+    if (mongoose.Types.ObjectId.isValid(userId as string)) {
+      filter.user = userId;
+    } else {
+      res.status(200).json([]);
+      return;
+    }
   }
   
   if (sessionId) {
-    filter.session = sessionId;
+    if (mongoose.Types.ObjectId.isValid(sessionId as string)) {
+      filter.session = sessionId;
+    } else {
+      res.status(200).json([]);
+      return;
+    }
   }
   
-  const messages = await Messages.find(filter)
-    .populate('user', 'name email')
-    .populate('session', 'name')
-    .sort({ createdAt: 1 });
-    
-  res.status(200).json(messages);
+  try {
+    const messages = await Messages.find(filter)
+      .populate('user', 'name email')
+      .populate('session', 'name')
+      .sort({ createdAt: 1 });
+      
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500);
+    throw new Error('Failed to fetch messages');
+  }
 });
 
 // @desc    get messages by session
