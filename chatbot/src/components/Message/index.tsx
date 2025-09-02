@@ -290,29 +290,21 @@ export const Message = ({ sessionId }: Props) => {
     try {
       const decoded = jwtDecode<User>(credentialResponse.credential);
 
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 10000);
-      });
-
-      const loginPromise = axios.post<GoogleLoginResponse["data"]>(`${API_BASE}/users/google-login`, {
+      const result = await dispatch(saveGoogleUser({
+        _id: decoded._id || '',
         name: decoded.name,
         email: decoded.email,
         picture: decoded.picture,
-      });
-
-      const response = await Promise.race([loginPromise, timeoutPromise]) as Awaited<typeof loginPromise>;
-
-      const userData = response.data;
-      dispatch(saveGoogleUser({
-        _id: userData._id,
-        name: userData.name,
-        email: userData.email,
-        picture: userData.picture,
       }));
-      
-      Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
-      console.log("User saved successfully");
-      setOpenedModal(false);
+
+      if (saveGoogleUser.fulfilled.match(result)) {
+        const userData = result.payload;
+        Cookies.set("googleUser", JSON.stringify(userData), { expires: 7 });
+        console.log("User saved successfully");
+        setOpenedModal(false);
+      } else {
+        throw new Error('Failed to save user to server');
+      }
       
     } catch (err) {
       console.error("Failed to save user", err);
@@ -329,7 +321,6 @@ export const Message = ({ sessionId }: Props) => {
       } else {
         console.error("An unknown error occurred during login.");
       }
-      setOpenedModal(false);
     } finally {
       setGoogleLoginLoading(false);
     }
