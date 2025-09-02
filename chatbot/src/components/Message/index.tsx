@@ -62,7 +62,6 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginRequiredModal, setOpenedLoginRequiredModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
-
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
@@ -122,14 +121,29 @@ export const Message = ({ sessionId }: Props) => {
   useEffect(() => {
     const storedGuestUser = Cookies.get("guestUser");
     const storedGoogleUser = Cookies.get("googleUser");
-    const storedUser = storedGuestUser || storedGoogleUser;
-
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      if (parsedUser.isGuest) {
-        dispatch(saveGuestUser(parsedUser));
-      } else {
-        dispatch(saveGoogleUser(parsedUser));
+    
+    if (storedGoogleUser) {
+      try {
+        const parsedUser = JSON.parse(storedGoogleUser);
+        if (parsedUser && parsedUser._id && parsedUser.email) {
+          dispatch(saveGoogleUser(parsedUser));
+        } else {
+          console.error("Invalid Google user data in cookie");
+          Cookies.remove("googleUser");
+        }
+      } catch (error) {
+        console.error("Failed to parse Google user cookie:", error);
+        Cookies.remove("googleUser");
+      }
+    } else if (storedGuestUser) {
+      try {
+        const parsedUser = JSON.parse(storedGuestUser);
+        if (parsedUser) {
+          dispatch(saveGuestUser(parsedUser));
+        }
+      } catch (error) {
+        console.error("Failed to parse guest user cookie:", error);
+        Cookies.remove("guestUser");
       }
     }
   }, [dispatch]);

@@ -107,7 +107,18 @@ const getAssistant = (id: string): Assistant | null => {
 const syncAssistantsFromServer = async (userId: string) => {
   try {
     const res = await fetch(`${API_BASE}/assistants?user=${encodeURIComponent(userId)}`);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
     const serverList = await res.json();
+    
+    if (!Array.isArray(serverList)) {
+      console.error("Server returned non-array response:", serverList);
+      return getList();
+    }
+    
     const normalized: AssistantList = serverList.map((item: any) => ({
       id: item._id,
       name: item.name,
@@ -119,6 +130,7 @@ const syncAssistantsFromServer = async (userId: string) => {
       max_log: item.max_log,
       max_tokens: item.max_tokens,
     }));
+    
     if (normalized.length > 0) {
       updateList(normalized);
       return normalized;

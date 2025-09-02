@@ -64,6 +64,12 @@ export const saveGoogleUser = createAsyncThunk("googleUser/save", async ({ _id, 
       picture,
     })
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+  }
+  
   const data = await response.json();
   return data;
 })
@@ -85,6 +91,13 @@ export const UsersSlice = createSlice({
     });
     builder.addCase(saveGoogleUser.fulfilled, (state, action) => {
       state.currentUser = action.payload;
+    });
+
+    builder.addCase(saveGoogleUser.rejected, (state, action) => {
+      console.error("Failed to save Google user:", action.error.message);
+    });
+    builder.addCase(saveGuestUser.rejected, (state, action) => {
+      console.error("Failed to save guest user:", action.error.message);
     });
   },
 })

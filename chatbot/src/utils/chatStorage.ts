@@ -185,12 +185,24 @@ export const removeSession = (id: string, userId?: string) => {
 export const syncSessionsFromServer = async (userId: string) => {
   try {
     const res = await fetch(`${API_BASE}/sessions?user=${encodeURIComponent(userId)}`);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
     const serverList = await res.json();
+    
+    if (!Array.isArray(serverList)) {
+      console.error("Server returned non-array response:", serverList);
+      return getSessionStore();
+    }
+    
     const normalized: SessionList = serverList.map((item: any) => ({
       id: item._id,
       name: item.name,
       assistant: item.assistant,
     }));
+    
     if (normalized.length > 0) {
       updateSessionStore(normalized);
       return normalized;

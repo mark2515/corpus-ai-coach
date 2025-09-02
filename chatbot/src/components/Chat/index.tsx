@@ -16,9 +16,14 @@ export const Chat = () => {
   useEffect(() => {
     const init = async () => {
       let list;
-      if (currentUser && !currentUser.isGuest) {
-        await assistantStore.syncAssistantsFromServer(currentUser._id);
-        list = await chatStorage.syncSessionsFromServer(currentUser._id);
+      if (currentUser && currentUser._id && !currentUser.isGuest) {
+        try {
+          await assistantStore.syncAssistantsFromServer(currentUser._id);
+          list = await chatStorage.syncSessionsFromServer(currentUser._id);
+        } catch (error) {
+          console.error("Failed to sync data from server:", error);
+          list = chatStorage.getSessionStore();
+        }
       } else {
         list = chatStorage.getSessionStore();
       }
