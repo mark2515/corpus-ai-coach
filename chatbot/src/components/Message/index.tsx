@@ -22,6 +22,11 @@ import {
   IconSendOff,
   IconEraser,
   IconDotsVertical,
+  IconUser,
+  IconSettings,
+  IconRobot,
+  IconNotebook,
+  IconLogout,
 } from "@tabler/icons-react";
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
@@ -407,23 +412,6 @@ export const Message = ({ sessionId }: Props) => {
           )}
         </Modal>
         
-        <Popover width={100} position="bottom" withArrow shadow="sm">
-          <Popover.Target>
-            <Button
-              size="sm"
-              variant="subtle"
-              className="px-1"
-              rightIcon={<IconDotsVertical size="1rem"></IconDotsVertical>}
-            >
-              AI Chatbots
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown className="p-3 min-w-[200px]">
-            <Link href="/chatbots" className="no-underline text-green-600">
-              Chatbot Management
-            </Link>
-          </Popover.Dropdown>
-        </Popover>
         <div className="flex items-center mr-auto">
           <AssistantSelect
             value={assistant?.id!}
@@ -449,17 +437,93 @@ export const Message = ({ sessionId }: Props) => {
               />
             </Popover.Target>
             <Popover.Dropdown>
-              <div className="flex flex-col items-start">
-                <div className="mb-2 text-sm text-gray-700">{currentUser?.name}</div>
+              <div className="flex flex-col items-start min-w-[180px]">
+                <div className="mb-3 pb-2 border-b border-gray-200 w-full">
+                  <div className={`text-sm font-medium ${colorScheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{currentUser?.name}</div>
+                  <div className="text-xs text-gray-500">{currentUser?.email}</div>
+                </div>
+                
                 <Button
                   size="xs"
-                  variant="outline"
-                  color="red"
-                  onClick={onLogout}
+                  variant="subtle"
+                  color="gray"
+                  leftIcon={<IconUser size="0.9rem" />}
+                  onClick={() => {/* Handle profile */}}
                   fullWidth
+                  className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+                  styles={{
+                    inner: { justifyContent: 'flex-start' },
+                    leftIcon: { marginRight: '12px' }
+                  }}
                 >
-                  Log out
+                  Account
                 </Button>
+                                
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  leftIcon={<IconRobot size="0.9rem" />}
+                  onClick={() => window.location.href = '/chatbots'}
+                  fullWidth
+                  className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+                  styles={{
+                    inner: { justifyContent: 'flex-start' },
+                    leftIcon: { marginRight: '12px' }
+                  }}
+                >
+                  My Chatbots
+                </Button>
+                
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  leftIcon={<IconNotebook size="0.9rem" />}
+                  onClick={() => {/* Handle chat history */}}
+                  fullWidth
+                  className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+                  styles={{
+                    inner: { justifyContent: 'flex-start' },
+                    leftIcon: { marginRight: '12px' }
+                  }}
+                >
+                  My WordList
+                </Button>
+
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  leftIcon={<IconSettings size="0.9rem" />}
+                  onClick={() => {/* Handle settings */}}
+                  fullWidth
+                  className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+                  styles={{
+                    inner: { justifyContent: 'flex-start' },
+                    leftIcon: { marginRight: '12px' }
+                  }}
+                >
+                  Settings
+                </Button>
+                
+                <div className="w-full border-t border-gray-200 mt-2 pt-2">
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    color="red"
+                    leftIcon={<IconLogout size="0.9rem" />}
+                    onClick={onLogout}
+                    fullWidth
+                    className="justify-start pl-2"
+                    styles={{
+                      inner: { justifyContent: 'flex-start' },
+                      leftIcon: { marginRight: '12px' }
+                    }}
+                  >
+                    Log out
+                  </Button>
+                </div>
               </div>
             </Popover.Dropdown>
           </Popover>
