@@ -10,7 +10,6 @@ import {
   Popover,
   Modal,
 } from "@mantine/core";
-import Link from "next/link";
 import * as chatStorage from "@/utils/chatStorage";
 import assistantStore from "@/utils/assistantStore";
 import { ThemeSwitch } from "../ThemeSwitch";
@@ -51,15 +50,6 @@ const guestUser: User = {
   isGuest: true,
 };
 
-interface GoogleLoginResponse {
-  data: {
-    _id: string;
-    name: string;
-    email: string;
-    picture: string;
-  };
-}
-
 export const Message = ({ sessionId }: Props) => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,6 +60,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
   const [openedLogoutPopover, setOpenedLogoutPopover] = useState(false);
   const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const currentUser = useAppSelector(selectCurrentUser);
   const messageRef = useRef<MessageList>([]);
@@ -152,6 +143,10 @@ export const Message = ({ sessionId }: Props) => {
       }
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const onAssistantChange = (assistant: Assistant) => {
     setAssistant(assistant);
@@ -419,7 +414,8 @@ export const Message = ({ sessionId }: Props) => {
           ></AssistantSelect>
           <ThemeSwitch></ThemeSwitch>
         </div>
-        {currentUser ? (
+        
+        {isClient && Cookies.get("googleUser") ? (
           <Popover
             opened={openedLogoutPopover}
             onClose={() => setOpenedLogoutPopover(false)}
@@ -429,18 +425,18 @@ export const Message = ({ sessionId }: Props) => {
           >
             <Popover.Target>
               <img
-                src={currentUser?.picture}
-                alt={currentUser?.name}
+                src={JSON.parse(Cookies.get("googleUser") || '{}')?.picture}
+                alt={JSON.parse(Cookies.get("googleUser") || '{}')?.name}
                 className="w-8 h-8 rounded-full border cursor-pointer"
-                title={currentUser?.name}
+                title={JSON.parse(Cookies.get("googleUser") || '{}')?.name}
                 onClick={() => setOpenedLogoutPopover((v) => !v)}
               />
             </Popover.Target>
             <Popover.Dropdown>
               <div className="flex flex-col items-start min-w-[180px]">
                 <div className="mb-3 pb-2 border-b border-gray-200 w-full">
-                  <div className={`text-sm font-medium ${colorScheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{currentUser?.name}</div>
-                  <div className="text-xs text-gray-500">{currentUser?.email}</div>
+                  <div className={`text-sm font-medium ${colorScheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{JSON.parse(Cookies.get("googleUser") || '{}')?.name}</div>
+                  <div className="text-xs text-gray-500">{JSON.parse(Cookies.get("googleUser") || '{}')?.email}</div>
                 </div>
                 
                 <Button
@@ -527,7 +523,7 @@ export const Message = ({ sessionId }: Props) => {
               </div>
             </Popover.Dropdown>
           </Popover>
-        ) : (
+        ) : isClient ? (
           <>
             <div className="hidden md:flex gap-2 items-center">
               <Button
@@ -580,8 +576,9 @@ export const Message = ({ sessionId }: Props) => {
                 </Popover.Dropdown>
               </Popover>
             </div>
-          </>)}
-          </div>
+          </>
+        ) : null}
+      </div>
         <div
             className={clsx([
               "flex-col",
