@@ -9,7 +9,7 @@
     "mongoose": "^8.16.1"
   },
   "name": "corpus-ai-coach",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "typescript project",
   "main": "server.ts",
   "scripts": {

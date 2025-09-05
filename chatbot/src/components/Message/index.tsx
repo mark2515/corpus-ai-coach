@@ -26,6 +26,10 @@ import {
   IconRobot,
   IconNotebook,
   IconLogout,
+  IconBell,
+  IconLanguage,
+  IconPalette,
+  IconShield,
 } from "@tabler/icons-react";
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
@@ -55,6 +59,8 @@ export const Message = ({ sessionId }: Props) => {
   const [loading, setLoading] = useState(false);
   const [openedModal, setOpenedModal] = useState(false);
   const [openedLoginRequiredModal, setOpenedLoginRequiredModal] = useState(false);
+  const [openedAccountModal, setOpenedAccountModal] = useState(false);
+  const [openedSettingsModal, setOpenedSettingsModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
@@ -381,7 +387,7 @@ export const Message = ({ sessionId }: Props) => {
           </div>
         </Modal>
 
-         <Modal
+        <Modal
           opened={openedModal}
           onClose={() => setOpenedModal(false)}
           title="Sign In"
@@ -407,12 +413,60 @@ export const Message = ({ sessionId }: Props) => {
           )}
         </Modal>
         
+        <Modal
+          opened={openedAccountModal}
+          onClose={() => setOpenedAccountModal(false)}
+          title={<strong>Account Settings</strong>}
+          centered
+          size="md"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4 p-4 bg-green-100 dark:bg-green-800/30 rounded-lg">
+              <img
+                src={currentUser?.picture || "/guest.png"}
+                alt={currentUser?.name || "User"}
+                className="w-16 h-16 rounded-full border"
+              />
+              <div>
+                <h3 className="font-semibold text-lg">{currentUser?.name}</h3>
+                <p className="text-gray-600 dark:text-gray-400">{currentUser?.email}</p>
+              </div>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          opened={openedSettingsModal}
+          onClose={() => setOpenedSettingsModal(false)}
+          title={<strong>Settings</strong>}
+          centered
+          size="md"
+        >
+          <div className="space-y-2">
+            <div className="flex items-center justify-between p-2 border-b">
+              <div className="flex items-center space-x-3">
+                <IconPalette size="1.2rem" className="text-gray-600 dark:text-gray-400" />
+                <div>
+                  <div className="font-medium">Theme</div>
+                  <div className="text-sm text-gray-500">Choose your preferred appearance</div>
+                </div>
+              </div>
+              <ThemeSwitch />
+            </div>
+
+            <div className="pt-4">
+              <div className="text-sm text-gray-500 text-center">
+                Version 0.1.0
+              </div>
+            </div>
+          </div>
+        </Modal>
+
         <div className="flex items-center mr-auto">
           <AssistantSelect
             value={assistant?.id!}
             onChange={onAssistantChange}
           ></AssistantSelect>
-          <ThemeSwitch></ThemeSwitch>
         </div>
         
         {isClient && (Cookies.get("googleUser") || Cookies.get("guestUser")) ? (
@@ -458,7 +512,10 @@ export const Message = ({ sessionId }: Props) => {
                   variant="subtle"
                   color="gray"
                   leftIcon={<IconUser size="0.9rem" />}
-                  onClick={() => {/* Handle profile */}}
+                  onClick={() => {
+                    setOpenedAccountModal(true);
+                    setOpenedLogoutPopover(false);
+                  }}
                   fullWidth
                   className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
                   styles={{
@@ -506,7 +563,10 @@ export const Message = ({ sessionId }: Props) => {
                   variant="subtle"
                   color="gray"
                   leftIcon={<IconSettings size="0.9rem" />}
-                  onClick={() => {/* Handle settings */}}
+                  onClick={() => {
+                    setOpenedSettingsModal(true);
+                    setOpenedLogoutPopover(false);
+                  }}
                   fullWidth
                   className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
                   styles={{
