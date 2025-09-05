@@ -415,7 +415,7 @@ export const Message = ({ sessionId }: Props) => {
           <ThemeSwitch></ThemeSwitch>
         </div>
         
-        {isClient && Cookies.get("googleUser") ? (
+        {isClient && (Cookies.get("googleUser") || Cookies.get("guestUser")) ? (
           <Popover
             opened={openedLogoutPopover}
             onClose={() => setOpenedLogoutPopover(false)}
@@ -425,8 +425,16 @@ export const Message = ({ sessionId }: Props) => {
           >
             <Popover.Target>
               <img
-                src={JSON.parse(Cookies.get("googleUser") || '{}')?.picture}
-                alt={JSON.parse(Cookies.get("googleUser") || '{}')?.name}
+                src={
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.picture 
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.picture
+                }
+                alt={
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.name 
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.name
+                }
                 className="w-8 h-8 rounded-full border cursor-pointer"
                 title={JSON.parse(Cookies.get("googleUser") || '{}')?.name}
                 onClick={() => setOpenedLogoutPopover((v) => !v)}
@@ -435,7 +443,13 @@ export const Message = ({ sessionId }: Props) => {
             <Popover.Dropdown>
               <div className="flex flex-col items-start min-w-[180px]">
                 <div className="mb-3 pb-2 border-b border-gray-200 w-full">
-                  <div className={`text-sm font-medium ${colorScheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{JSON.parse(Cookies.get("googleUser") || '{}')?.name}</div>
+                  <div className={`text-sm font-medium ${colorScheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {
+                      Cookies.get("googleUser") 
+                        ? JSON.parse(Cookies.get("googleUser") || '{}')?.name 
+                        : JSON.parse(Cookies.get("guestUser") || '{}')?.name
+                    }
+                  </div>
                   <div className="text-xs text-gray-500">{JSON.parse(Cookies.get("googleUser") || '{}')?.email}</div>
                 </div>
                 
