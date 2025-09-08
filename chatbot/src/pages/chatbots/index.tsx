@@ -9,8 +9,7 @@ import Link from "next/link";
 import { ActionIcon, Card, Text, Group, Drawer, Badge } from "@mantine/core";
 import { IconChevronLeft, IconUserPlus, IconPencil } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "@/store";
-import { selectCurrentUser } from "@/slices/usersSlice";
+import { useRouter } from "next/router";
 
 const showNotification = (message: string) => {
   notifications.show({
@@ -23,30 +22,71 @@ const showNotification = (message: string) => {
 };
 
 const Assistant: NextPage = () => {
+  const router = useRouter();
   const [assistantList, setAssistantList] = useState<AssistantList>([]);
   const [opened, drawerHandler] = useDisclosure(false);
   const [editAssistant, setEditAssistant] = useState<EditAssistant>();
-  const currentUser = useAppSelector(selectCurrentUser);
+  const [loading, setLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    if (router.isReady) {
+      setIsReady(true);
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    if (!isReady) return;
+
     const init = async () => {
-      if (currentUser && !currentUser.isGuest) {
-        const list = await assistantStore.syncAssistantsFromServer(currentUser._id);
-        setAssistantList(list);
-      } else {
+      setLoading(true);
+      
+      const urlUserId = router.query.id as string;
+      
+      if (!urlUserId) {
+        const cookieUserId = getCurrentUserId();
+        if (cookieUserId) {
+          router.replace(`/chatbots?id=${cookieUserId}`);
+          return;
+        } else {
+          router.replace('/chatbots?id=guest');
+          return;
+        }
+      }
+
+      try {
+        if (urlUserId === 'guest') {
+          const list = assistantStore.getList();
+          setAssistantList(list);
+        } else {
+          const list = await assistantStore.syncAssistantsFromServer(urlUserId);
+          setAssistantList(list);
+        }
+      } catch (error) {
+        console.error("Failed to load assistants:", error);
         const list = assistantStore.getList();
         setAssistantList(list);
+      } finally {
+        setLoading(false);
       }
     };
+    
     void init();
-  }, [currentUser]);
+  }, [isReady, router]);
+
+  const getCurrentUserId = () => {
+    return router.query.id as string;
+  };
 
   const saveAssistant = async (data: EditAssistant) => {
+    const userId = getCurrentUserId();
+    if (!userId) return;
+    
     if (data.id) {
       const newAssistantList = await assistantStore.updateAssistant(
         data.id,
         data,
-        currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+        userId === 'guest' ? undefined : userId,
       );
       setAssistantList(newAssistantList);
     } else {
@@ -56,7 +96,7 @@ const Assistant: NextPage = () => {
       };
       const newAssistantList = await assistantStore.addAssistant(
         newAssistant,
-        currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+        userId === 'guest' ? undefined : userId,
       );
       setAssistantList(newAssistantList);
     }
@@ -65,9 +105,12 @@ const Assistant: NextPage = () => {
   };
 
   const removeAssistant = async (id: string) => {
+    const userId = getCurrentUserId();
+    if (!userId) return;
+    
     const newAssistantList = await assistantStore.removeAssistant(
       id,
-      currentUser && !currentUser.isGuest ? currentUser._id : undefined,
+      userId === 'guest' ? undefined : userId,
     );
     setAssistantList(newAssistantList);
     showNotification("Remove Successfully");
@@ -87,6 +130,14 @@ const Assistant: NextPage = () => {
     setEditAssistant(newAssistant);
     drawerHandler.open();
   };
+
+  if (!isReady || loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Text>Loading...</Text>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col">

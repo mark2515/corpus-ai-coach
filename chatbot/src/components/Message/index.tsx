@@ -41,6 +41,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { saveGuestUser, saveGoogleUser, clearUser, selectCurrentUser } from "@/slices/usersSlice";
 import { User } from "../../types/index";
 import { API_BASE } from "@/utils/constant";
+import { getCurrentUserId } from "@/utils/userUtils";
 
 type Props = {
   sessionId: string;
@@ -547,7 +548,14 @@ export const Message = ({ sessionId }: Props) => {
                   variant="subtle"
                   color="gray"
                   leftIcon={<IconRobot size="0.9rem" />}
-                  onClick={() => window.location.href = '/chatbots'}
+                  onClick={() => {
+                    const userId = getCurrentUserId();
+                    if (userId) {
+                      window.location.href = `/chatbots?id=${userId}`;
+                    } else {
+                      window.location.href = '/chatbots?id=guest';
+                    }
+                  }}
                   fullWidth
                   className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
                   styles={{
