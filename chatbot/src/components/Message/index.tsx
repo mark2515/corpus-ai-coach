@@ -423,13 +423,29 @@ export const Message = ({ sessionId }: Props) => {
           <div className="space-y-4">
             <div className="flex items-center space-x-4 p-4 bg-green-100 dark:bg-green-800/30 rounded-lg">
               <img
-                src={currentUser?.picture || "/guest.png"}
-                alt={currentUser?.name || "User"}
+                src={
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.picture 
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.picture
+                }
+                alt={
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.name 
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.name
+                }
                 className="w-16 h-16 rounded-full border"
               />
               <div>
-                <h3 className="font-semibold text-lg">{currentUser?.name}</h3>
-                <p className="text-gray-600 dark:text-gray-400">{currentUser?.email}</p>
+                <h3 className="font-semibold text-lg">{
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.name 
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.name
+                }</h3>
+                <p className="text-gray-600 dark:text-gray-400">{
+                  Cookies.get("googleUser") 
+                    ? JSON.parse(Cookies.get("googleUser") || '{}')?.email
+                    : JSON.parse(Cookies.get("guestUser") || '{}')?.email
+                }</p>
               </div>
             </div>
           </div>
