@@ -442,7 +442,7 @@ export const Message = ({ sessionId }: Props) => {
                     ? JSON.parse(Cookies.get("googleUser") || '{}')?.name 
                     : JSON.parse(Cookies.get("guestUser") || '{}')?.name
                 }</h3>
-                <p className="text-gray-600 dark:text-gray-400">{
+                <p className="text-gray-500 dark:text-black-600">{
                   Cookies.get("googleUser") 
                     ? JSON.parse(Cookies.get("googleUser") || '{}')?.email
                     : JSON.parse(Cookies.get("guestUser") || '{}')?.email
@@ -465,7 +465,7 @@ export const Message = ({ sessionId }: Props) => {
                 <IconPalette size="1.2rem" className="text-gray-600 dark:text-gray-400" />
                 <div>
                   <div className="font-medium">Theme</div>
-                  <div className="text-sm text-gray-500">Choose your preferred appearance</div>
+                  <div className="text-sm text-gray-500">Choose your preferred theme</div>
                 </div>
               </div>
               <ThemeSwitch />

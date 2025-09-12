@@ -7,7 +7,7 @@ export const ThemeSwitch = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const [icon, setIcon] = useState(<IconSun />);
   useEffect(() => {
-    setIcon(colorScheme === "dark" ? <IconSun /> : <IconMoon />);
+    setIcon(colorScheme === "dark" ? <IconMoon /> : <IconSun />);
   }, [colorScheme]);
   return (
     <ActionIcon
