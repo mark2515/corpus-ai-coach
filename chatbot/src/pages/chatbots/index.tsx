@@ -162,7 +162,7 @@ const Assistant: NextPage = () => {
             shadow="sm"
             padding="lg"
             radius="md"
-            className="w-full max-w-sm group transition-all duration-300"
+            className="w-full max-w-sm group transition-all duration-300 relative"
           >
             <Text weight={500} className="line-clamp-1">
               {item.name}
@@ -170,30 +170,31 @@ const Assistant: NextPage = () => {
             <Text size="sm" color="dimmed" className="line-clamp-3 mt-2">
               {item.prompt}
             </Text>
-            <Group className="mt-4 flex items-center">
-              <Group>
-                <Badge size="md" color="violet" radius="sm">
-                  MODEL: {item.model}
-                </Badge>
-                <Badge size="md" color="green" radius="sm">
-                  TOKEN: {item.max_tokens}
-                </Badge>
-                <Badge size="md" color="blue" radius="sm">
-                  TEMP: {item.temperature}
-                </Badge>
-                <Badge size="md" color="blue" radius="sm">
-                  TOP_P: {item.top_p}
-                </Badge>
-                <Badge size="md" color="cyan" radius="sm">
-                  LOGS: {item.max_log}
-                </Badge>
-              </Group>
-              <Group className="w-full flex justify-end items-center opacity-0 transition-all duration-300 group-hover:opacity-100">
-                <ActionIcon size="sm" onClick={() => onEditAssistant(item)}>
-                  <IconPencil />
-                </ActionIcon>
-              </Group>
+            <Group className="mt-4 flex items-center flex-wrap">
+              <Badge size="md" color="violet" radius="sm">
+                MODEL: {item.model}
+              </Badge>
+              <Badge size="md" color="green" radius="sm">
+                TOKEN: {item.max_tokens}
+              </Badge>
+              <Badge size="md" color="blue" radius="sm">
+                TEMP: {item.temperature}
+              </Badge>
+              <Badge size="md" color="blue" radius="sm">
+                TOP_P: {item.top_p}
+              </Badge>
+              <Badge size="md" color="cyan" radius="sm">
+                LOGS: {item.max_log}
+              </Badge>
             </Group>
+            
+            <ActionIcon 
+              size="sm" 
+              onClick={() => onEditAssistant(item)}
+              className="absolute bottom-4 right-4 opacity-0 transition-all duration-300 group-hover:opacity-100 bg-gray-100 hover:bg-gray-200"
+            >
+              <IconPencil />
+            </ActionIcon>
           </Card>
         ))}
       </div>
