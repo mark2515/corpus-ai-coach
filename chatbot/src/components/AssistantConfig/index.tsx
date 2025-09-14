@@ -1,6 +1,6 @@
 import { EditAssistant } from "@/types";
 import React, { FormEvent, useState, useEffect } from "react";
-import { Button, Input, Textarea, NumberInput, Select } from "@mantine/core";
+import { Button, Input, Textarea, NumberInput, Select, Modal } from "@mantine/core";
 import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
 import assistantStore from "@/utils/assistantStore";
 const { Wrapper } = Input;
@@ -14,6 +14,7 @@ type Props = {
 export const AssistantConfig = ({ assistant, save, remove }: Props) => {
   const [data, setData] = useState<EditAssistant>(assistant);
   const [assistantCount, setAssistantCount] = useState(0);
+  const [openedRemoveConfirmModal, setOpenedRemoveConfirmModal] = useState(false);
 
   useEffect(() => {
     const list = assistantStore.getList();
@@ -41,8 +42,45 @@ export const AssistantConfig = ({ assistant, save, remove }: Props) => {
     });
   };
 
+  const handleRemove = () => {
+    remove(data.id as string);
+    setOpenedRemoveConfirmModal(false);
+  };
+
+  const handleRemoveClick = () => {
+    setOpenedRemoveConfirmModal(true);
+  };
+
   return (
     <div className="w-full flex justify-center">
+      <Modal
+        opened={openedRemoveConfirmModal}
+        onClose={() => setOpenedRemoveConfirmModal(false)}
+        title={<strong>Remove Chatbot</strong>}
+        centered
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p>
+            Are you sure you want to remove {data.name}?
+          </p>
+          <div className="flex gap-2 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setOpenedRemoveConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              style={{ color: 'white', backgroundColor: 'red'}} 
+              onClick={handleRemove}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       <form onSubmit={onSubmit} className="w-full flex flex-col gap-4">
         <Wrapper label="Name" description="Let's pick a name for the chatbot">
           <Input
@@ -159,7 +197,7 @@ export const AssistantConfig = ({ assistant, save, remove }: Props) => {
             <Button
               style={{ color: 'white', backgroundColor: 'red'}} 
               leftIcon={<IconTrash size="1.2rem" />}
-              onClick={() => remove(data.id as string)}
+              onClick={handleRemoveClick}
             >
               Remove
             </Button>

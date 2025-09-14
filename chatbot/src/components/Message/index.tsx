@@ -62,6 +62,7 @@ export const Message = ({ sessionId }: Props) => {
   const [openedLoginRequiredModal, setOpenedLoginRequiredModal] = useState(false);
   const [openedAccountModal, setOpenedAccountModal] = useState(false);
   const [openedSettingsModal, setOpenedSettingsModal] = useState(false);
+  const [openedClearConfirmModal, setOpenedClearConfirmModal] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
   const [assistant, setAssistant] = useState<Assistant>();
   const [openedLoginPopover, setOpenedLoginPopover] = useState(false);
@@ -181,6 +182,12 @@ export const Message = ({ sessionId }: Props) => {
         console.error("Error clearing messages from database:", error);
       }
     }
+    
+    setOpenedClearConfirmModal(false);
+  };
+
+  const handleClearClick = () => {
+    setOpenedClearConfirmModal(true);
   };
 
   const onKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -479,6 +486,34 @@ export const Message = ({ sessionId }: Props) => {
           </div>
         </Modal>
 
+        <Modal
+          opened={openedClearConfirmModal}
+          onClose={() => setOpenedClearConfirmModal(false)}
+          title={<strong>Clear Chat History</strong>}
+          centered
+          size="sm"
+        >
+          <div className="space-y-4">
+            <p>
+              Are you sure you want to clear all messages in this chat?
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setOpenedClearConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                style={{ color: 'white', backgroundColor: 'red'}} 
+                onClick={onClear}
+              >
+                Clear All
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
         <div className="flex items-center mr-auto">
           <AssistantSelect
             value={assistant?.id!}
@@ -748,7 +783,7 @@ export const Message = ({ sessionId }: Props) => {
             <ActionIcon
               className="mr-2"
               disabled={loading}
-              onClick={() => onClear()}
+              onClick={handleClearClick}
             >
               <IconEraser></IconEraser>
             </ActionIcon>
