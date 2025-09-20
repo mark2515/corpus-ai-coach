@@ -8,11 +8,11 @@ import assistantsRoute from "./routers/assistantsRouter";
 import sessionsRoute from "./routers/sessionsRouter";
 import { notFound, errorHandler } from './middleware/errorMiddleware'
 
+dotenv.config();
+connectDB();
 const app = express();
 app.use(express.json());
 app.use(cors());
-dotenv.config();
-connectDB();
 
 app.use((req, res, next) => {
     console.log(req.originalUrl)

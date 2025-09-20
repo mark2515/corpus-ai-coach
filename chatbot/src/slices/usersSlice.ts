@@ -1,10 +1,9 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@/store";
-import Cookies from 'js-cookie';
 import { API_BASE } from "@/utils/constant";
 
 export interface User {
-  _id: string,
+  _id: string;
   name: string;
   email: string;
   picture: string;
@@ -17,62 +16,74 @@ interface UserState {
 
 const initialState: UserState = {
   currentUser: null,
-}
-
-export const fetchUsers = createAsyncThunk("users/fetch", async () => {
-  const response = await fetch(`${API_BASE}/users`, {
-    method: "GET"
-  });
-  const data = await response.json();
-  return data;
-})
+};
 
 interface UserPayload {
-  _id: string,
+  _id: string;
   name: string;
   email: string;
   picture: string;
 }
 
-export const saveGuestUser = createAsyncThunk("guestUser/save", async ({ _id, name, email, picture }: UserPayload) => {
-  const response = await fetch(`${API_BASE}/users/guest-login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      _id,
-      name,
-      email,
-      picture,
-    })
-  });
-  const data = await response.json();
-  return data;
-})
+export const saveGuestUser = createAsyncThunk(
+  "guestUser/save",
+  async ({ _id, name, email, picture }: UserPayload, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE}/users/guest-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id,
+          name,
+          email,
+          picture,
+        })
+      });
 
-export const saveGoogleUser = createAsyncThunk("googleUser/save", async ({ _id, name, email, picture }: UserPayload) => {
-  const response = await fetch(`${API_BASE}/users/google-login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      _id,
-      name,
-      email,
-      picture,
-    })
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { ...data, isGuest: true };
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to save guest user');
+    }
   }
-  
-  const data = await response.json();
-  return data;
-})
+);
+
+export const saveGoogleUser = createAsyncThunk(
+  "googleUser/save",
+  async ({ _id, name, email, picture }: UserPayload, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE}/users/google-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          _id,
+          name,
+          email,
+          picture,
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to save Google user');
+    }
+  }
+);
 
 export const UsersSlice = createSlice({
   name: "user",
@@ -80,29 +91,28 @@ export const UsersSlice = createSlice({
   reducers: {
     clearUser: (state) => {
       state.currentUser = null;
+    },
+    setUser: (state, action) => {
+      state.currentUser = action.payload;
     }
   },
-  extraReducers(builder) {
-    builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      state.currentUser = action.payload[0] || null;
-    });
-    builder.addCase(saveGuestUser.fulfilled, (state, action) => {
-      state.currentUser = action.payload;
-    });
-    builder.addCase(saveGoogleUser.fulfilled, (state, action) => {
-      state.currentUser = action.payload;
-    });
-
-    builder.addCase(saveGoogleUser.rejected, (state, action) => {
-      console.error("Failed to save Google user:", action.error.message);
-    });
-    builder.addCase(saveGuestUser.rejected, (state, action) => {
-      console.error("Failed to save guest user:", action.error.message);
-    });
+  extraReducers: (builder) => {
+    builder
+      .addCase(saveGuestUser.fulfilled, (state, action) => {
+        state.currentUser = action.payload;
+      })
+      .addCase(saveGuestUser.rejected, (state, action) => {
+        console.error("Failed to save guest user:", action.payload);
+      })
+      .addCase(saveGoogleUser.fulfilled, (state, action) => {
+        state.currentUser = action.payload;
+      })
+      .addCase(saveGoogleUser.rejected, (state, action) => {
+        console.error("Failed to save Google user:", action.payload);
+      });
   },
-})
+});
 
 export default UsersSlice.reducer;
-export const { clearUser } = UsersSlice.actions;
-
+export const { clearUser, setUser } = UsersSlice.actions;
 export const selectCurrentUser = (state: RootState) => state.user.currentUser;
