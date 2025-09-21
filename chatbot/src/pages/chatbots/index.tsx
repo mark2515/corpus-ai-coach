@@ -8,7 +8,7 @@ import { AssistantConfig } from "@/components/AssistantConfig";
 import Link from "next/link";
 import { ActionIcon, Card, Text, Group, Drawer, Badge } from "@mantine/core";
 import { IconChevronLeft, IconUserPlus, IconPencil } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 
 const showNotification = (message: string) => {
@@ -27,94 +27,101 @@ const Assistant: NextPage = () => {
   const [opened, drawerHandler] = useDisclosure(false);
   const [editAssistant, setEditAssistant] = useState<EditAssistant>();
   const [loading, setLoading] = useState(true);
-  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    if (router.isReady) {
-      setIsReady(true);
+  const getCurrentUserId = useCallback(() => {
+    return router.query.id as string;
+  }, [router.query.id]);
+
+  const loadAssistants = useCallback(async (userId: string) => {
+    try {
+      if (userId === 'guest') {
+        return assistantStore.getList();
+      } else {
+        return await assistantStore.syncAssistantsFromServer(userId);
+      }
+    } catch (error) {
+      console.error("Failed to load assistants:", error);
+      return assistantStore.getList();
     }
-  }, [router.isReady]);
+  }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!router.isReady) return;
 
     const init = async () => {
       setLoading(true);
-      
-      const urlUserId = router.query.id as string;
+      const urlUserId = getCurrentUserId();
       
       if (!urlUserId) {
-        const cookieUserId = getCurrentUserId();
-        if (cookieUserId) {
-          router.replace(`/chatbots?id=${cookieUserId}`);
-          return;
-        } else {
-          router.replace('/chatbots?id=guest');
-          return;
-        }
+        router.replace('/chatbots?id=guest');
+        return;
       }
 
-      try {
-        if (urlUserId === 'guest') {
-          const list = assistantStore.getList();
-          setAssistantList(list);
-        } else {
-          const list = await assistantStore.syncAssistantsFromServer(urlUserId);
-          setAssistantList(list);
-        }
-      } catch (error) {
-        console.error("Failed to load assistants:", error);
-        const list = assistantStore.getList();
-        setAssistantList(list);
-      } finally {
-        setLoading(false);
-      }
+      const list = await loadAssistants(urlUserId);
+      setAssistantList(list);
+      setLoading(false);
     };
     
-    void init();
-  }, [isReady, router]);
-
-  const getCurrentUserId = () => {
-    return router.query.id as string;
-  };
+    init();
+  }, [router.isReady, router, getCurrentUserId, loadAssistants]);
 
   const saveAssistant = async (data: EditAssistant) => {
     const userId = getCurrentUserId();
     if (!userId) return;
     
-    if (data.id) {
-      const newAssistantList = await assistantStore.updateAssistant(
-        data.id,
-        data,
-        userId === 'guest' ? undefined : userId,
-      );
+    try {
+      let newAssistantList: AssistantList;
+      
+      if (data.id) {
+        newAssistantList = await assistantStore.updateAssistant(
+          data.id,
+          data,
+          userId === 'guest' ? undefined : userId,
+        );
+      } else {
+        const newAssistant = {
+          ...data,
+          id: Date.now().toString(),
+        };
+        newAssistantList = await assistantStore.addAssistant(
+          newAssistant,
+          userId === 'guest' ? undefined : userId,
+        );
+      }
+      
       setAssistantList(newAssistantList);
-    } else {
-      const newAssistant = {
-        ...data,
-        id: Date.now().toString(),
-      };
-      const newAssistantList = await assistantStore.addAssistant(
-        newAssistant,
-        userId === 'guest' ? undefined : userId,
-      );
-      setAssistantList(newAssistantList);
+      showNotification("Save Successfully");
+      drawerHandler.close();
+    } catch (error) {
+      console.error("Failed to save assistant:", error);
+      notifications.show({
+        title: "Error",
+        message: "Failed to save assistant",
+        color: "red",
+      });
     }
-    showNotification("Save Successfully");
-    drawerHandler.close();
   };
 
   const removeAssistant = async (id: string) => {
     const userId = getCurrentUserId();
     if (!userId) return;
     
-    const newAssistantList = await assistantStore.removeAssistant(
-      id,
-      userId === 'guest' ? undefined : userId,
-    );
-    setAssistantList(newAssistantList);
-    showNotification("Remove Successfully");
-    drawerHandler.close();
+    try {
+      const newAssistantList = await assistantStore.removeAssistant(
+        id,
+        userId === 'guest' ? undefined : userId,
+      );
+      setAssistantList(newAssistantList);
+      showNotification("Remove Successfully");
+      drawerHandler.close();
+    } catch (error) {
+      console.error("Failed to remove assistant:", error);
+      notifications.show({
+        title: "Error",
+        message: "Failed to remove assistant",
+        color: "red",
+      });
+    }
   };
 
   const onEditAssistant = (data: EditAssistant) => {
@@ -131,7 +138,7 @@ const Assistant: NextPage = () => {
     drawerHandler.open();
   };
 
-  if (!isReady || loading) {
+  if (!router.isReady || loading) {
     return (
       <div className="h-screen flex items-center justify-center">
         <Text>Loading...</Text>
@@ -150,8 +157,8 @@ const Assistant: NextPage = () => {
         <Text weight={500} size="lg">
           Chatbot Management
         </Text>
-        <ActionIcon onClick={() => onAddAssistant()}>
-          <IconUserPlus></IconUserPlus>
+        <ActionIcon onClick={onAddAssistant}>
+          <IconUserPlus />
         </ActionIcon>
       </div>
 
@@ -198,17 +205,20 @@ const Assistant: NextPage = () => {
           </Card>
         ))}
       </div>
+      
       <Drawer
         opened={opened}
         onClose={drawerHandler.close}
         size="lg"
         position="right"
       >
-        <AssistantConfig
-          assistant={editAssistant!}
-          save={saveAssistant}
-          remove={removeAssistant}
-        />
+        {editAssistant && (
+          <AssistantConfig
+            assistant={editAssistant}
+            save={saveAssistant}
+            remove={removeAssistant}
+          />
+        )}
       </Drawer>
     </div>
   );
