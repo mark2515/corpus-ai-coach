@@ -5,7 +5,7 @@ import {
   ParsedEvent,
   ReconnectInterval,
 } from "eventsource-parser";
-import { MAX_TOKEN, OPENAI_END_POINT, TEAMPERATURE, TOP_P } from "@/utils/constant";
+import { MAX_TOKEN, OPENAI_END_POINT, TEMPERATURE, TOP_P } from "@/utils/constant";
 
 type StreamPayload = {
   model: string;
@@ -33,7 +33,7 @@ export default async function handler(req: NextRequest) {
       },
     ],
     stream: true,
-    temperature: +temperature || TEAMPERATURE,
+    temperature: +temperature || TEMPERATURE,
     top_p: +top_p || TOP_P,
     max_tokens: max_tokens || MAX_TOKEN,
   };
@@ -82,7 +82,9 @@ const createStream = (response: Response, counter: number) => {
             const q = encoder.encode(text);
             controller.enqueue(q);
             counter++;
-          } catch (error) {}
+          } catch (error) {
+            console.error("Error parsing streaming data:", error);
+          }
         }
       };
 

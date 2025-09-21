@@ -4,7 +4,7 @@ export const ASSISTANT_STORE = "ai_assistant_assistant";
 export const CURRENT_SESSION_COOKIE = "current_session";
 
 export const MAX_TOKEN = 800;
-export const TEAMPERATURE = 0.7;
+export const TEMPERATURE = 0.7;
 export const TOP_P = 0.9;
 
 export const ASSISTANT_INIT = [
