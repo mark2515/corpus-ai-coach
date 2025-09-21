@@ -41,7 +41,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { saveGuestUser, saveGoogleUser, clearUser, selectCurrentUser } from "@/slices/usersSlice";
 import { User } from "../../types/index";
 import { API_BASE } from "@/utils/constant";
-import { getCurrentUserId } from "@/utils/userUtils";
+import { getCurrentUser } from "@/utils/userUtils";
 
 type Props = {
   sessionId: string;
@@ -584,7 +584,8 @@ export const Message = ({ sessionId }: Props) => {
                   color="gray"
                   leftIcon={<IconRobot size="0.9rem" />}
                   onClick={() => {
-                    const userId = getCurrentUserId();
+                    const user = getCurrentUser();
+                    const userId = user?.isGuest ? 'guest' : user?._id;
                     if (userId) {
                       window.location.href = `/chatbots?id=${userId}`;
                     } else {
