@@ -26,10 +26,7 @@ import {
   IconRobot,
   IconNotebook,
   IconLogout,
-  IconBell,
-  IconLanguage,
   IconPalette,
-  IconShield,
 } from "@tabler/icons-react";
 import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";

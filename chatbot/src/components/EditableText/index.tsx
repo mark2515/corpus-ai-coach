@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, KeyboardEvent } from "react";
 import clsx from "clsx";
 
 type IProps = {
@@ -12,17 +12,37 @@ export const EditableText = (props: IProps) => {
 
   const handleDoubleClick = () => {
     setIsEditing(true);
+    setText(props.text);
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    props.onSave(text);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setText(props.text);
   };
 
   const onBlur = () => {
     if (isEditing) {
-      setIsEditing(false);
-      props.onSave(text);
+      handleSave();
     }
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSave();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      handleCancel();
+    }
   };
 
   if (isEditing) {
@@ -40,6 +60,7 @@ export const EditableText = (props: IProps) => {
         value={text}
         onChange={onChange}
         onBlur={onBlur}
+        onKeyDown={onKeyDown}
         autoFocus
       />
     );
