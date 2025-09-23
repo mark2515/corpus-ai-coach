@@ -6,10 +6,11 @@ import { notifications } from "@mantine/notifications";
 import { NextPage } from "next";
 import { AssistantConfig } from "@/components/AssistantConfig";
 import Link from "next/link";
-import { ActionIcon, Card, Text, Group, Drawer, Badge } from "@mantine/core";
+import { ActionIcon, Card, Text, Group, Drawer, Badge, Modal, Button } from "@mantine/core";
 import { IconChevronLeft, IconUserPlus, IconPencil } from "@tabler/icons-react";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
+import Cookies from "js-cookie";
 
 const showNotification = (message: string) => {
   notifications.show({
@@ -27,10 +28,34 @@ const Assistant: NextPage = () => {
   const [opened, drawerHandler] = useDisclosure(false);
   const [editAssistant, setEditAssistant] = useState<EditAssistant>();
   const [loading, setLoading] = useState(true);
+  const [authModalOpened, setAuthModalOpened] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const getCurrentUserId = useCallback(() => {
     return router.query.id as string;
   }, [router.query.id]);
+
+  const checkAuthentication = useCallback((urlUserId: string): boolean => {
+    const storedGoogleUser = Cookies.get("googleUser");
+    const storedGuestUser = Cookies.get("guestUser");
+
+    if (urlUserId === 'guest') {
+      return !!storedGuestUser;
+    }
+
+    if (storedGoogleUser) {
+      try {
+        const parsedUser = JSON.parse(storedGoogleUser);
+        return parsedUser && parsedUser._id === urlUserId;
+      } catch (error) {
+        console.error("Failed to parse Google user cookie:", error);
+        Cookies.remove("googleUser");
+        return false;
+      }
+    }
+
+    return false;
+  }, []);
 
   const loadAssistants = useCallback(async (userId: string) => {
     try {
@@ -45,6 +70,11 @@ const Assistant: NextPage = () => {
     }
   }, []);
 
+  const handleBackToHome = () => {
+    setAuthModalOpened(false);
+    router.push('/');
+  };
+
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -57,17 +87,27 @@ const Assistant: NextPage = () => {
         return;
       }
 
+      const authenticated = checkAuthentication(urlUserId);
+      
+      if (!authenticated) {
+        setIsAuthenticated(false);
+        setAuthModalOpened(true);
+        setLoading(false);
+        return;
+      }
+
+      setIsAuthenticated(true);
       const list = await loadAssistants(urlUserId);
       setAssistantList(list);
       setLoading(false);
     };
     
     init();
-  }, [router.isReady, router, getCurrentUserId, loadAssistants]);
+  }, [router.isReady, router, getCurrentUserId, loadAssistants, checkAuthentication]);
 
   const saveAssistant = async (data: EditAssistant) => {
     const userId = getCurrentUserId();
-    if (!userId) return;
+    if (!userId || !isAuthenticated) return;
     
     try {
       let newAssistantList: AssistantList;
@@ -104,7 +144,7 @@ const Assistant: NextPage = () => {
 
   const removeAssistant = async (id: string) => {
     const userId = getCurrentUserId();
-    if (!userId) return;
+    if (!userId || !isAuthenticated) return;
     
     try {
       const newAssistantList = await assistantStore.removeAssistant(
@@ -125,11 +165,13 @@ const Assistant: NextPage = () => {
   };
 
   const onEditAssistant = (data: EditAssistant) => {
+    if (!isAuthenticated) return;
     setEditAssistant(data);
     drawerHandler.open();
   };
 
   const onAddAssistant = () => {
+    if (!isAuthenticated) return;
     const newAssistant = {
       ...ASSISTANT_INIT[0],
       name: `Chatbot No.${assistantList.length + 1}`,
@@ -143,6 +185,34 @@ const Assistant: NextPage = () => {
       <div className="h-screen flex items-center justify-center">
         <Text>Loading...</Text>
       </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <div className="h-screen flex items-center justify-center">
+          <Text>Checking authentication...</Text>
+        </div>
+        <Modal
+          opened={authModalOpened}
+          onClose={() => {}}
+          title={<Text fw="bold" size="lg">Authentication Required</Text>}
+          centered
+          closeOnClickOutside={false}
+          closeOnEscape={false}
+          withCloseButton={false}
+        >
+          <Text mb="md">
+            You do not have permission to access this page. Please return to the homepage and log in.
+          </Text>
+          <Group position="right">
+            <Button onClick={handleBackToHome} style={{ color: 'white', backgroundColor: 'teal' }}>
+              Back to Home
+            </Button>
+          </Group>
+        </Modal>
+      </>
     );
   }
 
