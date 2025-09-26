@@ -2,11 +2,15 @@ import React from "react";
 import { marked } from "marked";
 import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-dark.css";
-
 import styles from "./index.module.css";
+
 type IProps = {
   markdownText: string;
 };
+
+/**
+ * Markdown component that renders markdown text with syntax highlighting
+ */
 
 export const Markdown = (props: IProps) => {
   const renderer = new marked.Renderer();

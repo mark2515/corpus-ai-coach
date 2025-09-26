@@ -12,7 +12,6 @@ import {
   Modal,
   Button,
   Drawer,
-  useMantineTheme,
   MediaQuery,
   Burger,
 } from "@mantine/core";
@@ -28,6 +27,7 @@ type Props = {
 
 const itemBaseClasses = "flex cursor-pointer h-[2.4rem] items-center justify-around group px-4 rounded-md";
 
+// Generate different colors for session items based on current state and theme
 const generateItemClasses = (
   id: string,
   sessionId: string,
@@ -39,9 +39,9 @@ const generateItemClasses = (
       "hover:bg-gray-300/60": colorScheme === "light",
       "bg-gray-200/60": id !== sessionId && colorScheme === "light",
       "bg-gray-300": id === sessionId && colorScheme === "light",
-      "hover:bg-zinc-800/50": colorScheme === "dark",
-      "bg-zinc-800/20": id !== sessionId && colorScheme === "dark",
-      "bg-zinc-800/90": id === sessionId && colorScheme === "dark",
+      "hover:bg-zinc-500/60": colorScheme === "dark",
+      "bg-zinc-600/20": id !== sessionId && colorScheme === "dark",
+      "bg-zinc-600/60": id === sessionId && colorScheme === "dark",
     },
   ]);
 };

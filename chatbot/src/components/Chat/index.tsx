@@ -44,6 +44,7 @@ export const Chat = () => {
 
   return (
     <div className="h-screen flex w-screen">
+      { /* Use MediaQuery to implement responsive layout */ }
       <MediaQuery
         smallerThan="md"
         styles={{

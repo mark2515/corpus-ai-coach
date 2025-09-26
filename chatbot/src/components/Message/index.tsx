@@ -188,7 +188,7 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   const onKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (evt.keyCode === 13 && !evt.shiftKey) {
+    if (evt.key === "Enter" && !evt.shiftKey) {
       evt.preventDefault();
       onSubmit();
     }
@@ -604,7 +604,7 @@ export const Message = ({ sessionId }: Props) => {
                   variant="subtle"
                   color="gray"
                   leftIcon={<IconNotebook size="0.9rem" />}
-                  onClick={() => {/* Handle chat history */}}
+                  onClick={() => {/* Handle My WordList */}}
                   fullWidth
                   className={`justify-start mb-1 pl-2 ${colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
                   styles={{
