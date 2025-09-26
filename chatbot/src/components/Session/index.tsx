@@ -52,7 +52,6 @@ export const Session = ({ sessionId, onChange, className }: Props) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const { colorScheme } = useMantineColorScheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const theme = useMantineTheme();
   const currentUser = useAppSelector(selectCurrentUser);
 
   useEffect(() => {

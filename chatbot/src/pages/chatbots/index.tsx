@@ -32,7 +32,7 @@ const Assistant: NextPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const getCurrentUserId = useCallback(() => {
-    return router.query.id as string;
+    return router.query.id as string | undefined;
   }, [router.query.id]);
 
   const checkAuthentication = useCallback((urlUserId: string): boolean => {
@@ -103,7 +103,7 @@ const Assistant: NextPage = () => {
     };
     
     init();
-  }, [router.isReady, router, getCurrentUserId, loadAssistants, checkAuthentication]);
+  }, [router.isReady, router.query.id]);
 
   const saveAssistant = async (data: EditAssistant) => {
     const userId = getCurrentUserId();
